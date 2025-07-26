@@ -1,4 +1,4 @@
 
 # MDTerp module
 
-::: MDTerp.MDTerp
+::: MDTerp.base.run
