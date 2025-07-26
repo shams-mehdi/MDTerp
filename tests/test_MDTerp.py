@@ -5,8 +5,6 @@
 
 import unittest
 
-from MDTerp import base
-
 
 class TestMdterp(unittest.TestCase):
     """Tests for `MDTerp` package."""
