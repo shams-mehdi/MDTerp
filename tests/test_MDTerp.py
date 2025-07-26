@@ -5,7 +5,7 @@
 
 import unittest
 
-from MDTerp import MDTerp
+from MDTerp import base
 
 
 class TestMdterp(unittest.TestCase):
