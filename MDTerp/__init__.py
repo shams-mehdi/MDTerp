@@ -1,6 +1,7 @@
 [project]
-version = "0.1.4"
-authors = [{ name="""shams mehdi""", email="shamsmehdi222@gmail.com"}]
+__version__ = "0.1.4"
+__author__ = """shams mehdi"""
+__email__ = "shamsmehdi222@gmail.com"
 requires-python = ">=3.7"
 dependencies = [
     "numpy",

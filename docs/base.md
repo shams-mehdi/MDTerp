@@ -1,4 +1,0 @@
-
-# MDTerp module
-
-::: MDTerp.base
