@@ -3,10 +3,10 @@ import os
 import shutil
 import pickle
 
-from neighborhood import generate_neighborhood
-from utils import log_maker, input_summary, picker_fn
-from init_analysis import init_model
-from final_analysis import final_model
+from MDTerp.neighborhood import generate_neighborhood
+from MDTerp.utils import log_maker, input_summary, picker_fn
+from MDTerp.init_analysis import init_model
+from MDTerp.final_analysis import final_model
 
 class run:
     """
