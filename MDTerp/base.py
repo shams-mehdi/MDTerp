@@ -1,4 +1,3 @@
-"""Main module."""
 import numpy as np
 import os
 import shutil
@@ -10,6 +9,9 @@ from init_analysis import init_model
 from final_analysis import final_model
 
 class run:
+    """
+    Main class for implementing MDTERP
+    """
     def __init__(self, np_data, model_function_loc, numeric_dict = {}, angle_dict = {}, sin_cos_dict = {}, save_dir = './results/', prob_threshold = 0.48, point_max = 20, num_samples = 5000, cutoff = 25, seed = 0, unfaithfulness_threshold = 0.01):
 
         # Initializing necessities
