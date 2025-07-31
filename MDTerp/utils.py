@@ -17,7 +17,7 @@ def log_maker(save_dir: str) -> Logger:
         save_dir (str): Location to save MDTerp results.
 
     Returns:
-        Logger: Logger object created using built-in logging module.
+        Logger: Logger object created using Python's built-in logging module.
     """
     fmt = '%(asctime)s %(name)-15s %(levelname)-8s %(message)s'
     datefmt='%m-%d-%y %H:%M:%S'
@@ -36,15 +36,15 @@ def log_maker(save_dir: str) -> Logger:
 
 def input_summary(logger: Logger, numeric_dict: dict, angle_dict: dict, sin_cos_dict: dict, save_dir: str, np_data: np.ndarray) -> None:
     """
-    Function for logging user-provided input data summary.
+    Function for summarizing user-provided input data in Python Logger.
 
     Args:
-        logger (Logger): Logger object created using built-in logging module.
-        numeric_dict (dict): Python dictionary, each key represents the name of a numeric feature. Value should be a list with a single element with the index of the corresponding numpy array in np_data.
-        angle_dict (dict): Python dictionary, each key represents the name of a angular feature in [-pi, pi]. Value should be a list with a single element with the index of the corresponding numpy array in np_data.
-        sin_cos_dict (dict): Python dictionary, each key represents the name of a angular feature. Value should be a list with a two element with the sine, cosine indices respectively of the corresponding numpy array in np_data.
+        logger (Logger): Logger object created using Python's built-in logging module.
+        numeric_dict (dict): Python dictionary, each key represents the name of a numeric feature (non-periodic). Values should be lists with a single element with the index of the corresponding numpy array in np_data.
+        angle_dict (dict): Python dictionary, each key represents the name of an angular feature in [-pi, pi]. Values should be lists with a single element with the index of the corresponding numpy array in np_data.
+        sin_cos_dict (dict): Python dictionary, each key represents the name of an angular feature. Values should be lists with two elements with the sine, cosine indices respectively of the corresponding numpy array in np_data.
         save_dir (str): Location to save MDTerp results.
-        np_data (np.ndarray): Numpy 2D array containing training data for the black-box model with samples along rows and features along columns.
+        np_data (np.ndarray): Numpy 2D array containing training data for the black-box model. Samples along rows and features along columns.
         
     Returns:
         None
@@ -64,12 +64,12 @@ def input_summary(logger: Logger, numeric_dict: dict, angle_dict: dict, sin_cos_
 
 def picker_fn(prob: np.ndarray, threshold: float, point_max: int) -> dict:
     """
-    Function for picking points at the transition state ensemble from the provided data using black-box state prediction probability.
+    Function for picking points at the transition state ensemble. Uses provided data and metastable state probability from black-box.
 
     Args:
-        prob (np.ndarray): Numpy 2D array containing metastable state prediction probabilities from the black-box model with samples along rows and number of columns equal to number of classes. Each row should sum to 1.
-        threshold (float): Threshold for identifying if a sample belongs to transition state according to the black-box model. If metastable state probability > threshold for two different classes for a specific sample according to the blackbox, the sample is suitable for analysis.
-        point_max (int): If too many points are suitable for picking for a specific transition (e.g., transition between metastable state 3 and 8), point_max sets maximum number of points chosen for analysis. Chosen by drawing from a uniform distribution, and done to reduce computation cost.
+        prob (np.ndarray): Numpy 2D array containing metastable state prediction probabilities from the black-box model. Rows represent samples and number of columns equal to number of states. Each row should sum to 1.
+        threshold (float): Threshold for identifying if a sample belongs to transition state predicted by the black-box model. If metastable state probability > threshold for two different classes for a specific sample, it's suitable for analysis.
+        point_max (int): If too many suitable points exist for a specific transition (e.g., transition between metastable state 3 and 8), point_max sets maximum number of points chosen for analysis. Points chosen from a uniform distribution.
         
     Returns:
         dict : Dictionary with keys representing detected transitions. E.g., key '3_8' means transition between index 3 and index 8 in according to the prob array. Values represent chosen samples/rows in the provided dataset which undergo this transition.
@@ -90,9 +90,9 @@ def summary(feature_names_loc: str, all_result_loc: str, save_fig_dir: str, top_
     Function summarizing MDTerp results for all the transitions present in the dataset.
 
     Args:
-        feature_names_loc (str): Location to save MDTerp results.
+        feature_names_loc (str): Location of the saved combined (all) feature names.
         all_results_loc (str): Location to save MDTerp results.
-        save_fig_dir (str): Location to save MDTerp results.
+        save_fig_dir (str): Location to save MDTerp results figures.
         top_k (int): Number of top ranked features to show in summary figures.
         fs (int): Fontsize of the labels in generated figures.
         dpi (int): DPI of the generated figures

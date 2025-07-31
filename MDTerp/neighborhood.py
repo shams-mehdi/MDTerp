@@ -1,9 +1,32 @@
+"""
+neighborhood.py – Function for genrating perturbed neighborhood samples.
+"""
 import numpy as np
 import os
 import copy
 import scipy.stats as sst
+from typing import Union, List
+import numpy as np
 
-def generate_neighborhood(save_dir, numeric_dict, angle_dict, sin_cos_dict, np_dat, index, seed, num_samples, selected_features = False):
+def generate_neighborhood(save_dir: str, numeric_dict: dict, angle_dict: dict, sin_cos_dict: dict, np_dat: np.ndarray, index: int, seed: int, num_samples: int, selected_features: Union[bool, List[int]] = False):
+    """
+    Function for creating a logger detailing MDTerp operations.
+
+    Args:
+        save_dir (str): Location to save MDTerp results.
+        numeric_dict (dict): Python dictionary, each key represents the name of a numeric feature (non-periodic). Values should be lists with a single element with the index of the corresponding numpy array in np_data.
+        angle_dict (dict): Python dictionary, each key represents the name of an angular feature in [-pi, pi]. Values should be lists with a single element with the index of the corresponding numpy array in np_data.
+        sin_cos_dict (dict): Python dictionary, each key represents the name of an angular feature. Values should be lists with two elements with the sine, cosine indices respectively of the corresponding numpy array in np_data.
+        np_dat (np.ndarray): Numpy 2D array containing training data for the black-box model. Samples along rows and features along columns.
+        index (int): Row/sample of the provided dataset using np_dat to analyze.
+        seed (int): Random seed.
+        num_samples (int): Size of the generated perturbed neighborhood.
+        selected_features: If False (default), perturbs all the features/columns. Otherwise, List of integers represent subset of features to perturb.
+
+    Returns:
+        list: List of np.ndarray indicating indices of numeric, angular, sin_cos features respectively.
+        lsit: List of the combined name of the features.
+    """
     np.random.seed(seed)
     if selected_features == False:
         save_directory = save_dir + 'DATA'
