@@ -589,6 +589,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#MDTerp.base.run.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__()
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -644,6 +653,52 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../init_analysis/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    init_analysis module
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../final_analysis/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    final_analysis module
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -686,6 +741,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#MDTerp.base.run.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__()
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -716,16 +780,35 @@
 <a id="MDTerp.base.run"></a>
     <div class="doc doc-contents first">
 
-      <p>Main class for implementing MDTERP</p>
+      <p>MDTerp.base.run - Main class for implementing MDTERP.</p>
 
         <details class="quote">
           <summary>Source code in <code>MDTerp/base.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">run</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Main class for implementing MDTERP</span>
+<span class="sd">    MDTerp.base.run - Main class for implementing MDTERP.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">np_data</span><span class="p">,</span> <span class="n">model_function_loc</span><span class="p">,</span> <span class="n">numeric_dict</span> <span class="o">=</span> <span class="p">{},</span> <span class="n">angle_dict</span> <span class="o">=</span> <span class="p">{},</span> <span class="n">sin_cos_dict</span> <span class="o">=</span> <span class="p">{},</span> <span class="n">save_dir</span> <span class="o">=</span> <span class="s1">&#39;./results/&#39;</span><span class="p">,</span> <span class="n">prob_threshold</span> <span class="o">=</span> <span class="mf">0.48</span><span class="p">,</span> <span class="n">point_max</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span> <span class="n">num_samples</span> <span class="o">=</span> <span class="mi">5000</span><span class="p">,</span> <span class="n">cutoff</span> <span class="o">=</span> <span class="mi">25</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">unfaithfulness_threshold</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">np_data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">model_function_loc</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">numeric_dict</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{},</span> <span class="n">angle_dict</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{},</span> <span class="n">sin_cos_dict</span><span class="p">:</span><span class="nb">dict</span> <span class="o">=</span> <span class="p">{},</span> <span class="n">save_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;./results/&#39;</span><span class="p">,</span> <span class="n">prob_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.48</span><span class="p">,</span> <span class="n">point_max</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5000</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">25</span><span class="p">,</span> <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">unfaithfulness_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor for the MDTerp.base.run class.</span>
 
+<span class="sd">        Args:</span>
+<span class="sd">            np_data (np.ndarray): Black-box training data.</span>
+<span class="sd">            model_function_loc (str): Location of a human-readable file containing two functions called &#39;load_model&#39;, and &#39;run_model&#39;. &#39;load_model&#39; must not take any arguments and should return the black-box model. &#39;run_model&#39; must be a function that takes two arguments: the model and data respectively, and returns metastable state probabilities. Go to https://shams-mehdi.github.io/MDTerp/blackbox/ for example blackbox models.</span>
+<span class="sd">            numeric_dict (dict): Python dictionary, each key represents the name of a numeric feature (non-periodic). Values should be lists with a single element with the index of the corresponding numpy array in np_data.</span>
+<span class="sd">            angle_dict (dict): Python dictionary, each key represents the name of an angular feature in [-pi, pi]. Values should be lists with a single element with the index of the corresponding numpy array in np_data.</span>
+<span class="sd">            sin_cos_dict (dict): Python dictionary, each key represents the name of an angular feature. Values should be lists with two elements with the sine, cosine indices respectively of the corresponding numpy array in np_data.</span>
+<span class="sd">            save_dir (str): Location to save MDTerp results.</span>
+<span class="sd">            prob_threshold (float): Threshold for identifying if a sample belongs to transition state predicted by the black-box model. If metastable state probability &gt; threshold for two different classes for a specific sample, it&#39;s suitable for analysis (Default: 0.48).</span>
+<span class="sd">        point_max (int): If too many suitable points exist for a specific transition (e.g., transition between metastable state 3 and 8), point_max sets maximum number of points chosen for analysis. Points chosen from a uniform distribution (Default: 20).</span>
+<span class="sd">            num_samples (int): Size of the perturbed neighborhood (Default: 5000). Ad hoc rule: should be proportional to the square root of the number of features.</span>
+<span class="sd">            cutoff (int): Maximum number of features selected for final round of MDTerp and forward feature selection.</span>
+<span class="sd">            seed (int): Random seed.</span>
+<span class="sd">        unf_threshold (float): Hyperparameter that sets a lower limit on unfaithafulness. Forward feature selection ends when unfaithfulness reaches lower than this threshold.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Initializing necessities</span>
         <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">save_dir</span><span class="p">,</span> <span class="n">exist_ok</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
         <span class="n">tmp_dir</span> <span class="o">=</span> <span class="n">save_dir</span> <span class="o">+</span> <span class="s1">&#39;tmp/&#39;</span>
@@ -758,12 +841,12 @@
                 <span class="n">given_indices</span><span class="p">,</span> <span class="n">indices_names</span> <span class="o">=</span> <span class="n">generate_neighborhood</span><span class="p">(</span><span class="n">tmp_dir</span><span class="p">,</span> <span class="n">numeric_dict</span><span class="p">,</span> <span class="n">angle_dict</span><span class="p">,</span> <span class="n">sin_cos_dict</span><span class="p">,</span> <span class="n">np_data</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">,</span> <span class="n">selected_features</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
                 <span class="n">state_probabilities2</span> <span class="o">=</span> <span class="n">local_ns</span><span class="p">[</span><span class="s2">&quot;run_model&quot;</span><span class="p">](</span><span class="n">model</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">tmp_dir</span> <span class="o">+</span> <span class="s1">&#39;DATA/make_prediction.npy&#39;</span><span class="p">))</span>
                 <span class="n">TERP_dat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">tmp_dir</span> <span class="o">+</span> <span class="s1">&#39;DATA/TERP_dat.npy&#39;</span><span class="p">)</span>
-                <span class="n">selected_features</span> <span class="o">=</span> <span class="n">init_model</span><span class="p">(</span><span class="n">tmp_dir</span><span class="p">,</span> <span class="n">TERP_dat</span><span class="p">,</span> <span class="n">state_probabilities2</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span> <span class="n">given_indices</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span>
+                <span class="n">selected_features</span> <span class="o">=</span> <span class="n">init_model</span><span class="p">(</span><span class="n">TERP_dat</span><span class="p">,</span> <span class="n">state_probabilities2</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span> <span class="n">given_indices</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span>
 
                 <span class="n">generate_neighborhood</span><span class="p">(</span><span class="n">tmp_dir</span><span class="p">,</span> <span class="n">numeric_dict</span><span class="p">,</span> <span class="n">angle_dict</span><span class="p">,</span> <span class="n">sin_cos_dict</span><span class="p">,</span> <span class="n">np_data</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">,</span> <span class="n">selected_features</span><span class="p">)</span>
                 <span class="n">state_probabilities3</span> <span class="o">=</span> <span class="n">local_ns</span><span class="p">[</span><span class="s2">&quot;run_model&quot;</span><span class="p">](</span><span class="n">model</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">tmp_dir</span> <span class="o">+</span> <span class="s1">&#39;DATA_2/make_prediction.npy&#39;</span><span class="p">))</span>
                 <span class="n">TERP_dat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">tmp_dir</span> <span class="o">+</span> <span class="s1">&#39;DATA_2/TERP_dat.npy&#39;</span><span class="p">)</span>
-                <span class="n">importance</span> <span class="o">=</span> <span class="n">final_model</span><span class="p">(</span><span class="n">tmp_dir</span><span class="p">,</span> <span class="n">TERP_dat</span><span class="p">,</span> <span class="n">state_probabilities3</span><span class="p">,</span> <span class="n">unfaithfulness_threshold</span><span class="p">,</span> <span class="n">given_indices</span><span class="p">,</span> <span class="n">selected_features</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span>
+                <span class="n">importance</span> <span class="o">=</span> <span class="n">final_model</span><span class="p">(</span><span class="n">TERP_dat</span><span class="p">,</span> <span class="n">state_probabilities3</span><span class="p">,</span> <span class="n">unfaithfulness_threshold</span><span class="p">,</span> <span class="n">given_indices</span><span class="p">,</span> <span class="n">selected_features</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span>
 
                 <span class="n">importance_master</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">transition</span><span class="p">,</span> <span class="n">importance</span><span class="p">]</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Generated &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">point</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">points</span><span class="p">[</span><span class="n">transition</span><span class="p">]))</span> <span class="o">+</span> <span class="s2">&quot; results!&quot;</span><span class="p">)</span>
@@ -797,6 +880,186 @@
 
 
 
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h2 id="MDTerp.base.run.__init__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">np_data</span><span class="p">,</span> <span class="n">model_function_loc</span><span class="p">,</span> <span class="n">numeric_dict</span><span class="o">=</span><span class="p">{},</span> <span class="n">angle_dict</span><span class="o">=</span><span class="p">{},</span> <span class="n">sin_cos_dict</span><span class="o">=</span><span class="p">{},</span> <span class="n">save_dir</span><span class="o">=</span><span class="s1">&#39;./results/&#39;</span><span class="p">,</span> <span class="n">prob_threshold</span><span class="o">=</span><span class="mf">0.48</span><span class="p">,</span> <span class="n">point_max</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">unfaithfulness_threshold</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-special"><code>special</code></small>
+  </span>
+
+<a href="#MDTerp.base.run.__init__" class="headerlink" title="Permanent link">&para;</a></h2>
+
+    <div class="doc doc-contents ">
+
+      <p>Constructor for the MDTerp.base.run class.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>np_data</code></td>
+        <td><code>np.ndarray</code></td>
+        <td><p>Black-box training data.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>model_function_loc</code></td>
+        <td><code>str</code></td>
+        <td><p>Location of a human-readable file containing two functions called 'load_model', and 'run_model'. 'load_model' must not take any arguments and should return the black-box model. 'run_model' must be a function that takes two arguments: the model and data respectively, and returns metastable state probabilities. Go to https://shams-mehdi.github.io/MDTerp/blackbox/ for example blackbox models.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>numeric_dict</code></td>
+        <td><code>dict</code></td>
+        <td><p>Python dictionary, each key represents the name of a numeric feature (non-periodic). Values should be lists with a single element with the index of the corresponding numpy array in np_data.</p></td>
+        <td><code>{}</code></td>
+      </tr>
+      <tr>
+        <td><code>angle_dict</code></td>
+        <td><code>dict</code></td>
+        <td><p>Python dictionary, each key represents the name of an angular feature in [-pi, pi]. Values should be lists with a single element with the index of the corresponding numpy array in np_data.</p></td>
+        <td><code>{}</code></td>
+      </tr>
+      <tr>
+        <td><code>sin_cos_dict</code></td>
+        <td><code>dict</code></td>
+        <td><p>Python dictionary, each key represents the name of an angular feature. Values should be lists with two elements with the sine, cosine indices respectively of the corresponding numpy array in np_data.</p></td>
+        <td><code>{}</code></td>
+      </tr>
+      <tr>
+        <td><code>save_dir</code></td>
+        <td><code>str</code></td>
+        <td><p>Location to save MDTerp results.</p></td>
+        <td><code>&#39;./results/&#39;</code></td>
+      </tr>
+      <tr>
+        <td><code>prob_threshold</code></td>
+        <td><code>float</code></td>
+        <td><p>Threshold for identifying if a sample belongs to transition state predicted by the black-box model. If metastable state probability &gt; threshold for two different classes for a specific sample, it's suitable for analysis (Default: 0.48).</p></td>
+        <td><code>0.48</code></td>
+      </tr>
+  </tbody>
+</table>      <p>point_max (int): If too many suitable points exist for a specific transition (e.g., transition between metastable state 3 and 8), point_max sets maximum number of points chosen for analysis. Points chosen from a uniform distribution (Default: 20).
+    num_samples (int): Size of the perturbed neighborhood (Default: 5000). Ad hoc rule: should be proportional to the square root of the number of features.
+    cutoff (int): Maximum number of features selected for final round of MDTerp and forward feature selection.
+    seed (int): Random seed.
+unf_threshold (float): Hyperparameter that sets a lower limit on unfaithafulness. Forward feature selection ends when unfaithfulness reaches lower than this threshold.</p>
+
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>None</code></td>
+      <td><p>None</p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>MDTerp/base.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">np_data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">model_function_loc</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">numeric_dict</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{},</span> <span class="n">angle_dict</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{},</span> <span class="n">sin_cos_dict</span><span class="p">:</span><span class="nb">dict</span> <span class="o">=</span> <span class="p">{},</span> <span class="n">save_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;./results/&#39;</span><span class="p">,</span> <span class="n">prob_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.48</span><span class="p">,</span> <span class="n">point_max</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5000</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">25</span><span class="p">,</span> <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">unfaithfulness_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Constructor for the MDTerp.base.run class.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        np_data (np.ndarray): Black-box training data.</span>
+<span class="sd">        model_function_loc (str): Location of a human-readable file containing two functions called &#39;load_model&#39;, and &#39;run_model&#39;. &#39;load_model&#39; must not take any arguments and should return the black-box model. &#39;run_model&#39; must be a function that takes two arguments: the model and data respectively, and returns metastable state probabilities. Go to https://shams-mehdi.github.io/MDTerp/blackbox/ for example blackbox models.</span>
+<span class="sd">        numeric_dict (dict): Python dictionary, each key represents the name of a numeric feature (non-periodic). Values should be lists with a single element with the index of the corresponding numpy array in np_data.</span>
+<span class="sd">        angle_dict (dict): Python dictionary, each key represents the name of an angular feature in [-pi, pi]. Values should be lists with a single element with the index of the corresponding numpy array in np_data.</span>
+<span class="sd">        sin_cos_dict (dict): Python dictionary, each key represents the name of an angular feature. Values should be lists with two elements with the sine, cosine indices respectively of the corresponding numpy array in np_data.</span>
+<span class="sd">        save_dir (str): Location to save MDTerp results.</span>
+<span class="sd">        prob_threshold (float): Threshold for identifying if a sample belongs to transition state predicted by the black-box model. If metastable state probability &gt; threshold for two different classes for a specific sample, it&#39;s suitable for analysis (Default: 0.48).</span>
+<span class="sd">    point_max (int): If too many suitable points exist for a specific transition (e.g., transition between metastable state 3 and 8), point_max sets maximum number of points chosen for analysis. Points chosen from a uniform distribution (Default: 20).</span>
+<span class="sd">        num_samples (int): Size of the perturbed neighborhood (Default: 5000). Ad hoc rule: should be proportional to the square root of the number of features.</span>
+<span class="sd">        cutoff (int): Maximum number of features selected for final round of MDTerp and forward feature selection.</span>
+<span class="sd">        seed (int): Random seed.</span>
+<span class="sd">    unf_threshold (float): Hyperparameter that sets a lower limit on unfaithafulness. Forward feature selection ends when unfaithfulness reaches lower than this threshold.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Initializing necessities</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">save_dir</span><span class="p">,</span> <span class="n">exist_ok</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="n">tmp_dir</span> <span class="o">=</span> <span class="n">save_dir</span> <span class="o">+</span> <span class="s1">&#39;tmp/&#39;</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">tmp_dir</span><span class="p">,</span> <span class="n">exist_ok</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="n">logger</span> <span class="o">=</span> <span class="n">log_maker</span><span class="p">(</span><span class="n">save_dir</span><span class="p">)</span>
+    <span class="n">input_summary</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">numeric_dict</span><span class="p">,</span> <span class="n">angle_dict</span><span class="p">,</span> <span class="n">sin_cos_dict</span><span class="p">,</span> <span class="n">save_dir</span><span class="p">,</span> <span class="n">np_data</span><span class="p">)</span>
+
+    <span class="c1"># Load Model</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Loading blackbox model &gt;&gt;&gt; &#39;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">model_function_loc</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+        <span class="n">func_code</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="n">local_ns</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">exec</span><span class="p">(</span><span class="n">func_code</span><span class="p">,</span> <span class="nb">globals</span><span class="p">(),</span> <span class="n">local_ns</span><span class="p">)</span>
+    <span class="n">model_loc</span><span class="p">,</span> <span class="n">model</span> <span class="o">=</span> <span class="n">local_ns</span><span class="p">[</span><span class="s2">&quot;load_model&quot;</span><span class="p">]()</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Model loaded from location &gt;&gt;&gt; &quot;</span> <span class="o">+</span> <span class="n">model_loc</span><span class="p">)</span>
+
+    <span class="c1"># Identify transition states for given/training dataset</span>
+    <span class="n">state_probabilities</span> <span class="o">=</span> <span class="n">local_ns</span><span class="p">[</span><span class="s2">&quot;run_model&quot;</span><span class="p">](</span><span class="n">model</span><span class="p">,</span> <span class="n">np_data</span><span class="p">)</span>
+    <span class="n">points</span> <span class="o">=</span> <span class="n">picker_fn</span><span class="p">(</span><span class="n">state_probabilities</span><span class="p">,</span> <span class="n">prob_threshold</span><span class="p">,</span> <span class="n">point_max</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Number of state transitions detected &gt;&gt;&gt; &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">points</span><span class="o">.</span><span class="n">keys</span><span class="p">()))))</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Probability threshold, maximum number of points per transition &gt;&gt;&gt; &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">prob_threshold</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">point_max</span><span class="p">)</span> <span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="mi">100</span><span class="o">*</span><span class="s1">&#39;-&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Loop over all the transitions</span>
+    <span class="n">importance_master</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">transition</span> <span class="ow">in</span> <span class="n">points</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Starting transition &gt;&gt;&gt; &quot;</span> <span class="o">+</span> <span class="n">transition</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">points</span><span class="p">[</span><span class="n">transition</span><span class="p">])):</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="n">points</span><span class="p">[</span><span class="n">transition</span><span class="p">][</span><span class="n">point</span><span class="p">]</span>
+            <span class="n">given_indices</span><span class="p">,</span> <span class="n">indices_names</span> <span class="o">=</span> <span class="n">generate_neighborhood</span><span class="p">(</span><span class="n">tmp_dir</span><span class="p">,</span> <span class="n">numeric_dict</span><span class="p">,</span> <span class="n">angle_dict</span><span class="p">,</span> <span class="n">sin_cos_dict</span><span class="p">,</span> <span class="n">np_data</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">,</span> <span class="n">selected_features</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="n">state_probabilities2</span> <span class="o">=</span> <span class="n">local_ns</span><span class="p">[</span><span class="s2">&quot;run_model&quot;</span><span class="p">](</span><span class="n">model</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">tmp_dir</span> <span class="o">+</span> <span class="s1">&#39;DATA/make_prediction.npy&#39;</span><span class="p">))</span>
+            <span class="n">TERP_dat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">tmp_dir</span> <span class="o">+</span> <span class="s1">&#39;DATA/TERP_dat.npy&#39;</span><span class="p">)</span>
+            <span class="n">selected_features</span> <span class="o">=</span> <span class="n">init_model</span><span class="p">(</span><span class="n">TERP_dat</span><span class="p">,</span> <span class="n">state_probabilities2</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span> <span class="n">given_indices</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span>
+
+            <span class="n">generate_neighborhood</span><span class="p">(</span><span class="n">tmp_dir</span><span class="p">,</span> <span class="n">numeric_dict</span><span class="p">,</span> <span class="n">angle_dict</span><span class="p">,</span> <span class="n">sin_cos_dict</span><span class="p">,</span> <span class="n">np_data</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">,</span> <span class="n">selected_features</span><span class="p">)</span>
+            <span class="n">state_probabilities3</span> <span class="o">=</span> <span class="n">local_ns</span><span class="p">[</span><span class="s2">&quot;run_model&quot;</span><span class="p">](</span><span class="n">model</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">tmp_dir</span> <span class="o">+</span> <span class="s1">&#39;DATA_2/make_prediction.npy&#39;</span><span class="p">))</span>
+            <span class="n">TERP_dat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">tmp_dir</span> <span class="o">+</span> <span class="s1">&#39;DATA_2/TERP_dat.npy&#39;</span><span class="p">)</span>
+            <span class="n">importance</span> <span class="o">=</span> <span class="n">final_model</span><span class="p">(</span><span class="n">TERP_dat</span><span class="p">,</span> <span class="n">state_probabilities3</span><span class="p">,</span> <span class="n">unfaithfulness_threshold</span><span class="p">,</span> <span class="n">given_indices</span><span class="p">,</span> <span class="n">selected_features</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span>
+
+            <span class="n">importance_master</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">transition</span><span class="p">,</span> <span class="n">importance</span><span class="p">]</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Generated &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">point</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">points</span><span class="p">[</span><span class="n">transition</span><span class="p">]))</span> <span class="o">+</span> <span class="s2">&quot; results!&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="mi">100</span><span class="o">*</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>
+
+    <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">save_dir</span> <span class="o">+</span> <span class="s1">&#39;MDTerp_feature_names.npy&#39;</span><span class="p">,</span> <span class="n">indices_names</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">save_dir</span> <span class="o">+</span> <span class="s1">&#39;MDTerp_results_all.pkl&#39;</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">importance_master</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Feature names saved at &gt;&gt;&gt; &quot;</span> <span class="o">+</span> <span class="n">save_dir</span> <span class="o">+</span> <span class="s1">&#39;MDTerp_feature_names.npy&#39;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;All results saved at &gt;&gt;&gt; &quot;</span> <span class="o">+</span> <span class="n">save_dir</span> <span class="o">+</span> <span class="s1">&#39;MDTerp_results_all.pkl&#39;</span><span class="p">)</span>
+
+
+    <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">tmp_dir</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Completed!!!&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Flush and close logger</span>
+    <span class="k">for</span> <span class="n">handler</span> <span class="ow">in</span> <span class="n">logger</span><span class="o">.</span><span class="n">handlers</span><span class="p">[:]:</span>
+        <span class="n">handler</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">removeHandler</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
 
 
 
