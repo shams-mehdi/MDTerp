@@ -15,7 +15,7 @@ class run:
     """
     MDTerp.base.run - Main class for implementing MDTERP.
     """
-    def __init__(self, np_data: np.ndarray, model_function_loc: str, numeric_dict: dict = {}, angle_dict: dict = {}, sin_cos_dict:dict = {}, save_dir: loc = './results/', prob_threshold: float = 0.48, point_max: int = 20, num_samples: int = 5000, cutoff: int = 25, seed: int = 0, unfaithfulness_threshold: float = 0.01) -> None:
+    def __init__(self, np_data: np.ndarray, model_function_loc: str, numeric_dict: dict = {}, angle_dict: dict = {}, sin_cos_dict:dict = {}, save_dir: str = './results/', prob_threshold: float = 0.48, point_max: int = 20, num_samples: int = 5000, cutoff: int = 25, seed: int = 0, unfaithfulness_threshold: float = 0.01) -> None:
         """
         Constructor for the MDTerp.base.run class.
         
