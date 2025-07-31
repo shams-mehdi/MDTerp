@@ -84,3 +84,4 @@ nav:
     - API Reference:
           - MDTerp module: MDTerp.md
           - utils module: utils.md
+          - neighborhood module: neighborhood.md

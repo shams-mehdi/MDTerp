@@ -1,5 +1,5 @@
 """
-neighborhood.py – Function for genrating perturbed neighborhood samples.
+neighborhood.py – Function for generating perturbed neighborhood samples.
 """
 import numpy as np
 import os
@@ -25,7 +25,7 @@ def generate_neighborhood(save_dir: str, numeric_dict: dict, angle_dict: dict, s
 
     Returns:
         list: List of np.ndarray indicating indices of numeric, angular, sin_cos features respectively.
-        lsit: List of the combined name of the features.
+        list: List of the combined name of the features.
     """
     np.random.seed(seed)
     if selected_features == False:
