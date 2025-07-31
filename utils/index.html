@@ -18,6 +18,8 @@
         <link rel="prev" href="../MDTerp/">
       
       
+        <link rel="next" href="../neighborhood/">
+      
       
       <link rel="icon" href="../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.16">
@@ -655,6 +657,29 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../neighborhood/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    neighborhood module
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -788,7 +813,7 @@
 
     <div class="doc doc-contents ">
 
-      <p>Function for logging user-provided input data summary.</p>
+      <p>Function for summarizing user-provided input data in Python Logger.</p>
 
 <p><strong>Parameters:</strong></p>
 <table>
@@ -804,25 +829,25 @@
       <tr>
         <td><code>logger</code></td>
         <td><code>Logger</code></td>
-        <td><p>Logger object created using built-in logging module.</p></td>
+        <td><p>Logger object created using Python's built-in logging module.</p></td>
         <td><em>required</em></td>
       </tr>
       <tr>
         <td><code>numeric_dict</code></td>
         <td><code>dict</code></td>
-        <td><p>Python dictionary, each key represents the name of a numeric feature. Value should be a list with a single element with the index of the corresponding numpy array in np_data.</p></td>
+        <td><p>Python dictionary, each key represents the name of a numeric feature (non-periodic). Values should be lists with a single element with the index of the corresponding numpy array in np_data.</p></td>
         <td><em>required</em></td>
       </tr>
       <tr>
         <td><code>angle_dict</code></td>
         <td><code>dict</code></td>
-        <td><p>Python dictionary, each key represents the name of a angular feature in [-pi, pi]. Value should be a list with a single element with the index of the corresponding numpy array in np_data.</p></td>
+        <td><p>Python dictionary, each key represents the name of an angular feature in [-pi, pi]. Values should be lists with a single element with the index of the corresponding numpy array in np_data.</p></td>
         <td><em>required</em></td>
       </tr>
       <tr>
         <td><code>sin_cos_dict</code></td>
         <td><code>dict</code></td>
-        <td><p>Python dictionary, each key represents the name of a angular feature. Value should be a list with a two element with the sine, cosine indices respectively of the corresponding numpy array in np_data.</p></td>
+        <td><p>Python dictionary, each key represents the name of an angular feature. Values should be lists with two elements with the sine, cosine indices respectively of the corresponding numpy array in np_data.</p></td>
         <td><em>required</em></td>
       </tr>
       <tr>
@@ -834,7 +859,7 @@
       <tr>
         <td><code>np_data</code></td>
         <td><code>np.ndarray</code></td>
-        <td><p>Numpy 2D array containing training data for the black-box model with samples along rows and features along columns.</p></td>
+        <td><p>Numpy 2D array containing training data for the black-box model. Samples along rows and features along columns.</p></td>
         <td><em>required</em></td>
       </tr>
   </tbody>
@@ -858,15 +883,15 @@
           <summary>Source code in <code>MDTerp/utils.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">input_summary</span><span class="p">(</span><span class="n">logger</span><span class="p">:</span> <span class="n">Logger</span><span class="p">,</span> <span class="n">numeric_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">angle_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">sin_cos_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">save_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">np_data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Function for logging user-provided input data summary.</span>
+<span class="sd">    Function for summarizing user-provided input data in Python Logger.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        logger (Logger): Logger object created using built-in logging module.</span>
-<span class="sd">        numeric_dict (dict): Python dictionary, each key represents the name of a numeric feature. Value should be a list with a single element with the index of the corresponding numpy array in np_data.</span>
-<span class="sd">        angle_dict (dict): Python dictionary, each key represents the name of a angular feature in [-pi, pi]. Value should be a list with a single element with the index of the corresponding numpy array in np_data.</span>
-<span class="sd">        sin_cos_dict (dict): Python dictionary, each key represents the name of a angular feature. Value should be a list with a two element with the sine, cosine indices respectively of the corresponding numpy array in np_data.</span>
+<span class="sd">        logger (Logger): Logger object created using Python&#39;s built-in logging module.</span>
+<span class="sd">        numeric_dict (dict): Python dictionary, each key represents the name of a numeric feature (non-periodic). Values should be lists with a single element with the index of the corresponding numpy array in np_data.</span>
+<span class="sd">        angle_dict (dict): Python dictionary, each key represents the name of an angular feature in [-pi, pi]. Values should be lists with a single element with the index of the corresponding numpy array in np_data.</span>
+<span class="sd">        sin_cos_dict (dict): Python dictionary, each key represents the name of an angular feature. Values should be lists with two elements with the sine, cosine indices respectively of the corresponding numpy array in np_data.</span>
 <span class="sd">        save_dir (str): Location to save MDTerp results.</span>
-<span class="sd">        np_data (np.ndarray): Numpy 2D array containing training data for the black-box model with samples along rows and features along columns.</span>
+<span class="sd">        np_data (np.ndarray): Numpy 2D array containing training data for the black-box model. Samples along rows and features along columns.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        None</span>
@@ -935,7 +960,7 @@
   <tbody>
     <tr>
       <td><code>Logger</code></td>
-      <td><p>Logger object created using built-in logging module.</p></td>
+      <td><p>Logger object created using Python's built-in logging module.</p></td>
     </tr>
   </tbody>
 </table>
@@ -949,7 +974,7 @@
 <span class="sd">        save_dir (str): Location to save MDTerp results.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        Logger: Logger object created using built-in logging module.</span>
+<span class="sd">        Logger: Logger object created using Python&#39;s built-in logging module.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> </span><span class="si">%(name)-15s</span><span class="s1"> </span><span class="si">%(levelname)-8s</span><span class="s1"> </span><span class="si">%(message)s</span><span class="s1">&#39;</span>
     <span class="n">datefmt</span><span class="o">=</span><span class="s1">&#39;%m-</span><span class="si">%d</span><span class="s1">-%y %H:%M:%S&#39;</span>
@@ -985,7 +1010,7 @@
 
     <div class="doc doc-contents ">
 
-      <p>Function for picking points at the transition state ensemble from the provided data using black-box state prediction probability.</p>
+      <p>Function for picking points at the transition state ensemble. Uses provided data and metastable state probability from black-box.</p>
 
 <p><strong>Parameters:</strong></p>
 <table>
@@ -1001,19 +1026,19 @@
       <tr>
         <td><code>prob</code></td>
         <td><code>np.ndarray</code></td>
-        <td><p>Numpy 2D array containing metastable state prediction probabilities from the black-box model with samples along rows and number of columns equal to number of classes. Each row should sum to 1.</p></td>
+        <td><p>Numpy 2D array containing metastable state prediction probabilities from the black-box model. Rows represent samples and number of columns equal to number of states. Each row should sum to 1.</p></td>
         <td><em>required</em></td>
       </tr>
       <tr>
         <td><code>threshold</code></td>
         <td><code>float</code></td>
-        <td><p>Threshold for identifying if a sample belongs to transition state according to the black-box model. If metastable state probability &gt; threshold for two different classes for a specific sample according to the blackbox, the sample is suitable for analysis.</p></td>
+        <td><p>Threshold for identifying if a sample belongs to transition state predicted by the black-box model. If metastable state probability &gt; threshold for two different classes for a specific sample, it's suitable for analysis.</p></td>
         <td><em>required</em></td>
       </tr>
       <tr>
         <td><code>point_max</code></td>
         <td><code>int</code></td>
-        <td><p>If too many points are suitable for picking for a specific transition (e.g., transition between metastable state 3 and 8), point_max sets maximum number of points chosen for analysis. Chosen by drawing from a uniform distribution, and done to reduce computation cost.</p></td>
+        <td><p>If too many suitable points exist for a specific transition (e.g., transition between metastable state 3 and 8), point_max sets maximum number of points chosen for analysis. Points chosen from a uniform distribution.</p></td>
         <td><em>required</em></td>
       </tr>
   </tbody>
@@ -1037,12 +1062,12 @@
           <summary>Source code in <code>MDTerp/utils.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">picker_fn</span><span class="p">(</span><span class="n">prob</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">point_max</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Function for picking points at the transition state ensemble from the provided data using black-box state prediction probability.</span>
+<span class="sd">    Function for picking points at the transition state ensemble. Uses provided data and metastable state probability from black-box.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        prob (np.ndarray): Numpy 2D array containing metastable state prediction probabilities from the black-box model with samples along rows and number of columns equal to number of classes. Each row should sum to 1.</span>
-<span class="sd">        threshold (float): Threshold for identifying if a sample belongs to transition state according to the black-box model. If metastable state probability &gt; threshold for two different classes for a specific sample according to the blackbox, the sample is suitable for analysis.</span>
-<span class="sd">        point_max (int): If too many points are suitable for picking for a specific transition (e.g., transition between metastable state 3 and 8), point_max sets maximum number of points chosen for analysis. Chosen by drawing from a uniform distribution, and done to reduce computation cost.</span>
+<span class="sd">        prob (np.ndarray): Numpy 2D array containing metastable state prediction probabilities from the black-box model. Rows represent samples and number of columns equal to number of states. Each row should sum to 1.</span>
+<span class="sd">        threshold (float): Threshold for identifying if a sample belongs to transition state predicted by the black-box model. If metastable state probability &gt; threshold for two different classes for a specific sample, it&#39;s suitable for analysis.</span>
+<span class="sd">        point_max (int): If too many suitable points exist for a specific transition (e.g., transition between metastable state 3 and 8), point_max sets maximum number of points chosen for analysis. Points chosen from a uniform distribution.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        dict : Dictionary with keys representing detected transitions. E.g., key &#39;3_8&#39; means transition between index 3 and index 8 in according to the prob array. Values represent chosen samples/rows in the provided dataset which undergo this transition.</span>
@@ -1093,7 +1118,7 @@
       <tr>
         <td><code>feature_names_loc</code></td>
         <td><code>str</code></td>
-        <td><p>Location to save MDTerp results.</p></td>
+        <td><p>Location of the saved combined (all) feature names.</p></td>
         <td><em>required</em></td>
       </tr>
       <tr>
@@ -1105,7 +1130,7 @@
       <tr>
         <td><code>save_fig_dir</code></td>
         <td><code>str</code></td>
-        <td><p>Location to save MDTerp results.</p></td>
+        <td><p>Location to save MDTerp results figures.</p></td>
         <td><em>required</em></td>
       </tr>
       <tr>
@@ -1150,9 +1175,9 @@
 <span class="sd">    Function summarizing MDTerp results for all the transitions present in the dataset.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        feature_names_loc (str): Location to save MDTerp results.</span>
+<span class="sd">        feature_names_loc (str): Location of the saved combined (all) feature names.</span>
 <span class="sd">        all_results_loc (str): Location to save MDTerp results.</span>
-<span class="sd">        save_fig_dir (str): Location to save MDTerp results.</span>
+<span class="sd">        save_fig_dir (str): Location to save MDTerp results figures.</span>
 <span class="sd">        top_k (int): Number of top ranked features to show in summary figures.</span>
 <span class="sd">        fs (int): Fontsize of the labels in generated figures.</span>
 <span class="sd">        dpi (int): DPI of the generated figures</span>
