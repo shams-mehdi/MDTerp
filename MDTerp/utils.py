@@ -69,7 +69,7 @@ def picker_fn(prob: np.ndarray, threshold: float, point_max: int) -> dict:
     Args:
         prob (np.ndarray): Numpy 2D array containing metastable state prediction probabilities from the black-box model with samples along rows and number of columns equal to number of classes. Each row should sum to 1.
         threshold (float): Threshold for identifying if a sample belongs to transition state according to the black-box model. If metastable state probability > threshold for two different classes for a specific sample according to the blackbox, the sample is suitable for analysis.
-        point_max (int): If too many points are suitable for picking for a specific transition (e.g., transition between metastable state 3 and 8), point_max sets maximum number of points chosen for analysis. Chosen by drawing from a unifrom distribution, and done to reduce computation cost.
+        point_max (int): If too many points are suitable for picking for a specific transition (e.g., transition between metastable state 3 and 8), point_max sets maximum number of points chosen for analysis. Chosen by drawing from a uniform distribution, and done to reduce computation cost.
         
     Returns:
         dict : Dictionary with keys representing detected transitions. E.g., key '3_8' means transition between index 3 and index 8 in according to the prob array. Values represent chosen samples/rows in the provided dataset which undergo this transition.
