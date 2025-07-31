@@ -7,6 +7,7 @@ import sklearn.metrics as met
 import copy
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as lda
 from sklearn.linear_model import Ridge
+from typing import Tuple
 
 def similarity_kernel(data: np.ndarray, kernel_width: float = 1.0) -> np.ndarray:
     """
@@ -22,7 +23,7 @@ def similarity_kernel(data: np.ndarray, kernel_width: float = 1.0) -> np.ndarray
     distances = met.pairwise_distances(data,data[0].reshape(1, -1),metric='euclidean').ravel()
     return np.sqrt(np.exp(-(distances ** 2) / kernel_width ** 2))
 
-def SGDreg(data: np.ndarray, labels: np.ndarray, seed: int, alpha: float = 1.0) -> np.ndarray, float:
+def SGDreg(data: np.ndarray, labels: np.ndarray, seed: int, alpha: float = 1.0) -> Tuple[np.ndarray, float]:
     """
     Function for implementing linear regression using stochastic gradient descent.
 
