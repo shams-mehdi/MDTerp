@@ -4,7 +4,7 @@
 [![image](https://img.shields.io/pypi/v/MDTerp.svg)](https://pypi.python.org/pypi/MDTerp)
 
 
-**A python project for interpreting molecular dynamics trajectory metastable state classifications from machine-learning models**
+**A python project for interpreting molecular dynamics (MD) trajectory metastable state classifications from machine-learning models**
 
 
 -   Free software: MIT License
@@ -13,4 +13,4 @@
 
 ## Features
 
--   TODO
+-   Quickly scan your blackbox model trained on MD data for feature importance.

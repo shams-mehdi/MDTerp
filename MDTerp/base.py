@@ -1,3 +1,6 @@
+"""
+MDTerp.base.py – Main MDTerp module.
+"""
 import numpy as np
 import os
 import shutil
@@ -10,10 +13,29 @@ from MDTerp.final_analysis import final_model
 
 class run:
     """
-    Main class for implementing MDTERP
+    MDTerp.base.run - Main class for implementing MDTERP.
     """
-    def __init__(self, np_data, model_function_loc, numeric_dict = {}, angle_dict = {}, sin_cos_dict = {}, save_dir = './results/', prob_threshold = 0.48, point_max = 20, num_samples = 5000, cutoff = 25, seed = 0, unfaithfulness_threshold = 0.01):
-
+    def __init__(self, np_data: np.ndarray, model_function_loc: str, numeric_dict: dict = {}, angle_dict: dict = {}, sin_cos_dict:dict = {}, save_dir: loc = './results/', prob_threshold: float = 0.48, point_max: int = 20, num_samples: int = 5000, cutoff: int = 25, seed: int = 0, unfaithfulness_threshold: float = 0.01) -> None:
+        """
+        Constructor for the MDTerp.base.run class.
+        
+        Args:
+            np_data (np.ndarray): Black-box training data.
+            model_function_loc (str): Location of a human-readable file containing two functions called 'load_model', and 'run_model'. 'load_model' must not take any arguments and should return the black-box model. 'run_model' must be a function that takes two arguments: the model and data respectively, and returns metastable state probabilities. Go to https://shams-mehdi.github.io/MDTerp/blackbox/ for example blackbox models.
+            numeric_dict (dict): Python dictionary, each key represents the name of a numeric feature (non-periodic). Values should be lists with a single element with the index of the corresponding numpy array in np_data.
+            angle_dict (dict): Python dictionary, each key represents the name of an angular feature in [-pi, pi]. Values should be lists with a single element with the index of the corresponding numpy array in np_data.
+            sin_cos_dict (dict): Python dictionary, each key represents the name of an angular feature. Values should be lists with two elements with the sine, cosine indices respectively of the corresponding numpy array in np_data.
+            save_dir (str): Location to save MDTerp results.
+            prob_threshold (float): Threshold for identifying if a sample belongs to transition state predicted by the black-box model. If metastable state probability > threshold for two different classes for a specific sample, it's suitable for analysis (Default: 0.48).
+        point_max (int): If too many suitable points exist for a specific transition (e.g., transition between metastable state 3 and 8), point_max sets maximum number of points chosen for analysis. Points chosen from a uniform distribution (Default: 20).
+            num_samples (int): Size of the perturbed neighborhood (Default: 5000). Ad hoc rule: should be proportional to the square root of the number of features.
+            cutoff (int): Maximum number of features selected for final round of MDTerp and forward feature selection.
+            seed (int): Random seed.
+        unf_threshold (float): Hyperparameter that sets a lower limit on unfaithafulness. Forward feature selection ends when unfaithfulness reaches lower than this threshold.
+        
+        Returns:
+            None
+        """
         # Initializing necessities
         os.makedirs(save_dir, exist_ok = True)
         tmp_dir = save_dir + 'tmp/'
@@ -46,12 +68,12 @@ class run:
                 given_indices, indices_names = generate_neighborhood(tmp_dir, numeric_dict, angle_dict, sin_cos_dict, np_data, index, seed, num_samples, selected_features = False)
                 state_probabilities2 = local_ns["run_model"](model, np.load(tmp_dir + 'DATA/make_prediction.npy'))
                 TERP_dat = np.load(tmp_dir + 'DATA/TERP_dat.npy')
-                selected_features = init_model(tmp_dir, TERP_dat, state_probabilities2, cutoff, given_indices, seed)
+                selected_features = init_model(TERP_dat, state_probabilities2, cutoff, given_indices, seed)
 
                 generate_neighborhood(tmp_dir, numeric_dict, angle_dict, sin_cos_dict, np_data, index, seed, num_samples, selected_features)
                 state_probabilities3 = local_ns["run_model"](model, np.load(tmp_dir + 'DATA_2/make_prediction.npy'))
                 TERP_dat = np.load(tmp_dir + 'DATA_2/TERP_dat.npy')
-                importance = final_model(tmp_dir, TERP_dat, state_probabilities3, unfaithfulness_threshold, given_indices, selected_features, seed)
+                importance = final_model(TERP_dat, state_probabilities3, unfaithfulness_threshold, given_indices, selected_features, seed)
 
                 importance_master[index] = [transition, importance]
                 logger.info("Generated " + str(point + 1) + "/" + str(len(points[transition])) + " results!")

@@ -1,5 +1,5 @@
 """
-utils.py – Auxiliary utility functions for MDTerp package.
+MDTerp.utils.py – Auxiliary utility functions for MDTerp package.
 """
 import logging
 from logging import Logger

@@ -85,3 +85,5 @@ nav:
           - MDTerp module: MDTerp.md
           - utils module: utils.md
           - neighborhood module: neighborhood.md
+          - init_analysis module: init_analysis.md
+          - final_analysis module: final_analysis.md

@@ -1,5 +1,5 @@
 """
-neighborhood.py – Function for generating perturbed neighborhood samples.
+MDTerp.neighborhood.py – Function for generating perturbed neighborhood samples.
 """
 import numpy as np
 import os
@@ -21,7 +21,7 @@ def generate_neighborhood(save_dir: str, numeric_dict: dict, angle_dict: dict, s
         index (int): Row/sample of the provided dataset using np_dat to analyze.
         seed (int): Random seed.
         num_samples (int): Size of the generated perturbed neighborhood.
-        selected_features: If False (default), perturbs all the features/columns. Otherwise, List of integers represent subset of features to perturb.
+        selected_features: If False (Default), perturbs all the features/columns. Otherwise, List of integers represent subset of features to perturb.
 
     Returns:
         list: List of np.ndarray indicating indices of numeric, angular, sin_cos features respectively.
