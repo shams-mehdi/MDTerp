@@ -15,7 +15,7 @@
         <link rel="canonical" href="https://shams-mehdi.github.io/MDTerp/MDTerp/">
       
       
-        <link rel="prev" href="../examples/MDTerp_intro/">
+        <link rel="prev" href="../changelog/">
       
       
         <link rel="next" href="../utils/">
@@ -461,12 +461,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../examples/MDTerp_intro/" class="md-nav__link">
+      <a href="../MDTerp_intro.ipynb" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    MDTerp intro
+    None
     
   </span>
   
@@ -800,7 +800,7 @@
 <span class="sd">            sin_cos_dict (dict): Python dictionary, each key represents the name of an angular feature. Values should be lists with two elements with the sine, cosine indices respectively of the corresponding numpy array in np_data.</span>
 <span class="sd">            save_dir (str): Location to save MDTerp results.</span>
 <span class="sd">            prob_threshold (float): Threshold for identifying if a sample belongs to transition state predicted by the black-box model. If metastable state probability &gt; threshold for two different classes for a specific sample, it&#39;s suitable for analysis (Default: 0.48).</span>
-<span class="sd">        point_max (int): If too many suitable points exist for a specific transition (e.g., transition between metastable state 3 and 8), point_max sets maximum number of points chosen for analysis. Points chosen from a uniform distribution (Default: 20).</span>
+<span class="sd">            point_max (int): If too many suitable points exist for a specific transition (e.g., transition between metastable state 3 and 8), point_max sets maximum number of points chosen for analysis. Points chosen from a uniform distribution (Default: 20).</span>
 <span class="sd">            num_samples (int): Size of the perturbed neighborhood (Default: 5000). Ad hoc rule: should be proportional to the square root of the number of features.</span>
 <span class="sd">            cutoff (int): Maximum number of features selected for final round of MDTerp and forward feature selection.</span>
 <span class="sd">            seed (int): Random seed.</span>
@@ -952,12 +952,32 @@
         <td><p>Threshold for identifying if a sample belongs to transition state predicted by the black-box model. If metastable state probability &gt; threshold for two different classes for a specific sample, it's suitable for analysis (Default: 0.48).</p></td>
         <td><code>0.48</code></td>
       </tr>
+      <tr>
+        <td><code>point_max</code></td>
+        <td><code>int</code></td>
+        <td><p>If too many suitable points exist for a specific transition (e.g., transition between metastable state 3 and 8), point_max sets maximum number of points chosen for analysis. Points chosen from a uniform distribution (Default: 20).</p></td>
+        <td><code>20</code></td>
+      </tr>
+      <tr>
+        <td><code>num_samples</code></td>
+        <td><code>int</code></td>
+        <td><p>Size of the perturbed neighborhood (Default: 5000). Ad hoc rule: should be proportional to the square root of the number of features.</p></td>
+        <td><code>5000</code></td>
+      </tr>
+      <tr>
+        <td><code>cutoff</code></td>
+        <td><code>int</code></td>
+        <td><p>Maximum number of features selected for final round of MDTerp and forward feature selection.</p></td>
+        <td><code>25</code></td>
+      </tr>
+      <tr>
+        <td><code>seed</code></td>
+        <td><code>int</code></td>
+        <td><p>Random seed.</p></td>
+        <td><code>0</code></td>
+      </tr>
   </tbody>
-</table>      <p>point_max (int): If too many suitable points exist for a specific transition (e.g., transition between metastable state 3 and 8), point_max sets maximum number of points chosen for analysis. Points chosen from a uniform distribution (Default: 20).
-    num_samples (int): Size of the perturbed neighborhood (Default: 5000). Ad hoc rule: should be proportional to the square root of the number of features.
-    cutoff (int): Maximum number of features selected for final round of MDTerp and forward feature selection.
-    seed (int): Random seed.
-unf_threshold (float): Hyperparameter that sets a lower limit on unfaithafulness. Forward feature selection ends when unfaithfulness reaches lower than this threshold.</p>
+</table>      <p>unf_threshold (float): Hyperparameter that sets a lower limit on unfaithafulness. Forward feature selection ends when unfaithfulness reaches lower than this threshold.</p>
 
 <p><strong>Returns:</strong></p>
 <table>
@@ -988,7 +1008,7 @@ unf_threshold (float): Hyperparameter that sets a lower limit on unfaithafulness
 <span class="sd">        sin_cos_dict (dict): Python dictionary, each key represents the name of an angular feature. Values should be lists with two elements with the sine, cosine indices respectively of the corresponding numpy array in np_data.</span>
 <span class="sd">        save_dir (str): Location to save MDTerp results.</span>
 <span class="sd">        prob_threshold (float): Threshold for identifying if a sample belongs to transition state predicted by the black-box model. If metastable state probability &gt; threshold for two different classes for a specific sample, it&#39;s suitable for analysis (Default: 0.48).</span>
-<span class="sd">    point_max (int): If too many suitable points exist for a specific transition (e.g., transition between metastable state 3 and 8), point_max sets maximum number of points chosen for analysis. Points chosen from a uniform distribution (Default: 20).</span>
+<span class="sd">        point_max (int): If too many suitable points exist for a specific transition (e.g., transition between metastable state 3 and 8), point_max sets maximum number of points chosen for analysis. Points chosen from a uniform distribution (Default: 20).</span>
 <span class="sd">        num_samples (int): Size of the perturbed neighborhood (Default: 5000). Ad hoc rule: should be proportional to the square root of the number of features.</span>
 <span class="sd">        cutoff (int): Maximum number of features selected for final round of MDTerp and forward feature selection.</span>
 <span class="sd">        seed (int): Random seed.</span>
