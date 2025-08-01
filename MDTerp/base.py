@@ -27,7 +27,7 @@ class run:
             sin_cos_dict (dict): Python dictionary, each key represents the name of an angular feature. Values should be lists with two elements with the sine, cosine indices respectively of the corresponding numpy array in np_data.
             save_dir (str): Location to save MDTerp results.
             prob_threshold (float): Threshold for identifying if a sample belongs to transition state predicted by the black-box model. If metastable state probability > threshold for two different classes for a specific sample, it's suitable for analysis (Default: 0.48).
-        point_max (int): If too many suitable points exist for a specific transition (e.g., transition between metastable state 3 and 8), point_max sets maximum number of points chosen for analysis. Points chosen from a uniform distribution (Default: 20).
+            point_max (int): If too many suitable points exist for a specific transition (e.g., transition between metastable state 3 and 8), point_max sets maximum number of points chosen for analysis. Points chosen from a uniform distribution (Default: 20).
             num_samples (int): Size of the perturbed neighborhood (Default: 5000). Ad hoc rule: should be proportional to the square root of the number of features.
             cutoff (int): Maximum number of features selected for final round of MDTerp and forward feature selection.
             seed (int): Random seed.

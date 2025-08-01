@@ -13,4 +13,4 @@
 
 ## Features
 
--   Quickly scan your blackbox model trained on MD data for feature importance.
+-   Scans your blackbox model trained on MD data for feature importance.

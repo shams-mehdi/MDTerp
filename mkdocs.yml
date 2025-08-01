@@ -80,7 +80,7 @@ nav:
     - Changelog: changelog.md
     - Report Issues: https://github.com/shams-mehdi/MDTerp/issues
     - Examples:
-        - examples/MDTerp_intro.ipynb
+        - MDTerp_intro.ipynb
     - API Reference:
           - MDTerp module: MDTerp.md
           - utils module: utils.md
