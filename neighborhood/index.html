@@ -461,7 +461,30 @@
   
   
     <li class="md-nav__item">
-      <a href="../MDTerp_intro.ipynb" class="md-nav__link">
+      <a href="../MDTerp_demo1.ipynb" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    None
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../MDTerp_demo2.ipynb" class="md-nav__link">
         
   
   
@@ -798,7 +821,7 @@
 
 
 <h2 id="MDTerp.neighborhood.generate_neighborhood" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">generate_neighborhood</span><span class="p">(</span><span class="n">save_dir</span><span class="p">,</span> <span class="n">numeric_dict</span><span class="p">,</span> <span class="n">angle_dict</span><span class="p">,</span> <span class="n">sin_cos_dict</span><span class="p">,</span> <span class="n">np_dat</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">,</span> <span class="n">selected_features</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="n">generate_neighborhood</span><span class="p">(</span><span class="n">save_dir</span><span class="p">,</span> <span class="n">numeric_dict</span><span class="p">,</span> <span class="n">angle_dict</span><span class="p">,</span> <span class="n">sin_cos_dict</span><span class="p">,</span> <span class="n">np_dat</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">,</span> <span class="n">perturbation_max</span><span class="p">,</span> <span class="n">selected_features</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
 
 <a href="#MDTerp.neighborhood.generate_neighborhood" class="headerlink" title="Permanent link">&para;</a></h2>
@@ -872,6 +895,12 @@
         <td><p>If False (Default), perturbs all the features/columns. Otherwise, List of integers represent subset of features to perturb.</p></td>
         <td><code>False</code></td>
       </tr>
+      <tr>
+        <td><code>perturbation_max</code></td>
+        <td><code>float</code></td>
+        <td><p>Hyperparameter that sets a maximum on the perturbation. Perturbation is calculated by taking standard deviation of the dataset for a feature and multiplying with value drawn from a normal distribution ~N(0,1). However, sometimes this can result in very high perturbation if the standard deviation of the feature is unreasonably high. To solve this, a percentage (chosen by this hyperparameter) of the range of that feature is set as the maximum factor to be multiplied to the values drawn from ~N(0,1).</p></td>
+        <td><em>required</em></td>
+      </tr>
   </tbody>
 </table>
 <p><strong>Returns:</strong></p>
@@ -892,7 +921,7 @@ list: List of the combined name of the features.</p></td>
 </table>
         <details class="quote">
           <summary>Source code in <code>MDTerp/neighborhood.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">generate_neighborhood</span><span class="p">(</span><span class="n">save_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">numeric_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">angle_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">sin_cos_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">np_dat</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">selected_features</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">generate_neighborhood</span><span class="p">(</span><span class="n">save_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">numeric_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">angle_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">sin_cos_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">np_dat</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">perturbation_max</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">selected_features</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Function for creating a logger detailing MDTerp operations.</span>
 
@@ -906,7 +935,7 @@ list: List of the combined name of the features.</p></td>
 <span class="sd">        seed (int): Random seed.</span>
 <span class="sd">        num_samples (int): Size of the generated perturbed neighborhood.</span>
 <span class="sd">        selected_features: If False (Default), perturbs all the features/columns. Otherwise, List of integers represent subset of features to perturb.</span>
-
+<span class="sd">        perturbation_max (float): Hyperparameter that sets a maximum on the perturbation. Perturbation is calculated by taking standard deviation of the dataset for a feature and multiplying with value drawn from a normal distribution ~N(0,1). However, sometimes this can result in very high perturbation if the standard deviation of the feature is unreasonably high. To solve this, a percentage (chosen by this hyperparameter) of the range of that feature is set as the maximum factor to be multiplied to the values drawn from ~N(0,1).</span>
 <span class="sd">    Returns:</span>
 <span class="sd">        list: List of np.ndarray indicating indices of numeric, angular, sin_cos features respectively.</span>
 <span class="sd">        list: List of the combined name of the features.</span>
@@ -959,7 +988,7 @@ list: List of the combined name of the features.</p></td>
 
           <span class="n">std_numeric</span> <span class="o">=</span> <span class="p">[]</span>
           <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">input_numeric</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
-            <span class="n">std_numeric</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">input_numeric</span><span class="p">[:,</span><span class="n">i</span><span class="p">]))</span>
+            <span class="n">std_numeric</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">input_numeric</span><span class="p">[:,</span><span class="n">i</span><span class="p">]),</span> <span class="n">perturbation_max</span><span class="o">*</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">input_numeric</span><span class="p">[:,</span><span class="n">i</span><span class="p">])</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">input_numeric</span><span class="p">[:,</span><span class="n">i</span><span class="p">]))))</span>
 
           <span class="n">make_prediction_numeric</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">num_samples</span><span class="p">,</span> <span class="n">input_numeric</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
           <span class="n">TERP_numeric</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">num_samples</span><span class="p">,</span> <span class="n">input_numeric</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
@@ -986,7 +1015,7 @@ list: List of the combined name of the features.</p></td>
 
       <span class="n">std_periodic</span> <span class="o">=</span> <span class="p">[]</span>
       <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">input_periodic</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
-        <span class="n">std_periodic</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sst</span><span class="o">.</span><span class="n">circstd</span><span class="p">(</span><span class="n">input_periodic</span><span class="p">[:,</span><span class="n">i</span><span class="p">],</span> <span class="n">high</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">low</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">))</span>
+        <span class="n">std_periodic</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">sst</span><span class="o">.</span><span class="n">circstd</span><span class="p">(</span><span class="n">input_periodic</span><span class="p">[:,</span><span class="n">i</span><span class="p">],</span> <span class="n">high</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">low</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">),</span> <span class="n">perturbation_max</span><span class="o">*</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">input_periodic</span><span class="p">[:,</span><span class="n">i</span><span class="p">])</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">input_periodic</span><span class="p">[:,</span><span class="n">i</span><span class="p">]))))</span>
 
       <span class="n">make_prediction_periodic</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">num_samples</span><span class="p">,</span> <span class="n">input_periodic</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
       <span class="n">TERP_periodic</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">num_samples</span><span class="p">,</span> <span class="n">input_periodic</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
@@ -1002,7 +1031,7 @@ list: List of the combined name of the features.</p></td>
             <span class="n">rand_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
             <span class="n">make_prediction_periodic</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">input_periodic</span><span class="p">[</span><span class="n">index</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">+</span> <span class="n">std_periodic</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">*</span><span class="n">rand_data</span>
             <span class="n">TERP_periodic</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">rand_data</span>
-            <span class="k">if</span> <span class="n">make_prediction_periodic</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">period_low</span> <span class="ow">or</span> <span class="n">make_prediction_periodic</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">period_high</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">make_prediction_periodic</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">&lt;</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="ow">or</span> <span class="n">make_prediction_periodic</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">:</span>
               <span class="n">make_prediction_periodic</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">make_prediction_periodic</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">make_prediction_periodic</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]))</span>
 
 
@@ -1022,7 +1051,7 @@ list: List of the combined name of the features.</p></td>
       <span class="n">input_sin_cos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">input_sin</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">input_sin</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
       <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">input_sin</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
         <span class="n">input_sin_cos</span><span class="p">[:,</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">input_sin</span><span class="p">[:,</span><span class="n">i</span><span class="p">],</span> <span class="n">input_cos</span><span class="p">[:,</span><span class="n">i</span><span class="p">])</span>
-        <span class="n">std_sin_cos</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sst</span><span class="o">.</span><span class="n">circstd</span><span class="p">(</span><span class="n">input_sin_cos</span><span class="p">[:,</span><span class="n">i</span><span class="p">],</span> <span class="n">high</span> <span class="o">=</span> <span class="n">period_high</span><span class="p">,</span> <span class="n">low</span> <span class="o">=</span> <span class="n">period_low</span><span class="p">))</span>
+        <span class="n">std_sin_cos</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">sst</span><span class="o">.</span><span class="n">circstd</span><span class="p">(</span><span class="n">input_sin_cos</span><span class="p">[:,</span><span class="n">i</span><span class="p">],</span> <span class="n">high</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">low</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">),</span> <span class="n">perturbation_max</span><span class="o">*</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">input_sin_cos</span><span class="p">[:,</span><span class="n">i</span><span class="p">])</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">input_sin_cos</span><span class="p">[:,</span><span class="n">i</span><span class="p">]))))</span>
 
       <span class="n">make_prediction_sin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">num_samples</span><span class="p">,</span> <span class="n">input_sin_cos</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
       <span class="n">make_prediction_cos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">num_samples</span><span class="p">,</span> <span class="n">input_sin_cos</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
