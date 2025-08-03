@@ -18,5 +18,5 @@
 
 ## Demos
 
--   [Notebook 1](docs/MDTerp_demo1.ipynb)
--   [Notebook 2](docs/MDTerp_demo2.ipynb)
+-   [Notebook 1](docs/examples/MDTerp_demo1.ipynb)
+-   [Notebook 2](docs/examples/MDTerp_demo2.ipynb)

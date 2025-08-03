@@ -21,7 +21,7 @@ class run:
         
         Args:
             np_data (np.ndarray): Black-box training data.
-            model_function_loc (str): Location of a human-readable file containing two functions called 'load_model()', and 'run_model()'. 'load_model' must not take any arguments and should return the black-box model. 'run_model' must be a function that takes two arguments: the model and data respectively, and returns metastable state probabilities. Go to https://shams-mehdi.github.io/MDTerp/examples/ for example files.
+            model_function_loc (str): Location of a human-readable file containing two functions called 'load_model()', and 'run_model()'. 'load_model' must not take any arguments and should return the black-box model. 'run_model' must be a function that takes two arguments: the model and data respectively, and returns metastable state probabilities. Go to https://shams-mehdi.github.io/MDTerp/docs/examples/ for example files.
             numeric_dict (dict): Python dictionary, each key represents the name of a numeric feature (non-periodic). Values should be lists with a single element with the index of the corresponding numpy array in np_data.
             angle_dict (dict): Python dictionary, each key represents the name of an angular feature in [-pi, pi]. Values should be lists with a single element with the index of the corresponding numpy array in np_data.
             sin_cos_dict (dict): Python dictionary, each key represents the name of an angular feature. Values should be lists with two elements with the sine, cosine indices respectively of the corresponding numpy array in np_data.
