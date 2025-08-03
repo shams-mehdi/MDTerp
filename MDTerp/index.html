@@ -15,7 +15,7 @@
         <link rel="canonical" href="https://shams-mehdi.github.io/MDTerp/MDTerp/">
       
       
-        <link rel="prev" href="../changelog/">
+        <link rel="prev" href="../examples/MDTerp_demo2/">
       
       
         <link rel="next" href="../utils/">
@@ -461,12 +461,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../../MDTerp_demo1.ipynb" class="md-nav__link">
+      <a href="../examples/MDTerp_demo1/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    None
+    MDTerp demo1
     
   </span>
   
@@ -484,12 +484,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../../MDTerp_demo2.ipynb" class="md-nav__link">
+      <a href="../examples/MDTerp_demo2/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    None
+    MDTerp demo2
     
   </span>
   
@@ -817,7 +817,7 @@
 
 <span class="sd">        Args:</span>
 <span class="sd">            np_data (np.ndarray): Black-box training data.</span>
-<span class="sd">            model_function_loc (str): Location of a human-readable file containing two functions called &#39;load_model()&#39;, and &#39;run_model()&#39;. &#39;load_model&#39; must not take any arguments and should return the black-box model. &#39;run_model&#39; must be a function that takes two arguments: the model and data respectively, and returns metastable state probabilities. Go to https://shams-mehdi.github.io/MDTerp/examples/ for example files.</span>
+<span class="sd">            model_function_loc (str): Location of a human-readable file containing two functions called &#39;load_model()&#39;, and &#39;run_model()&#39;. &#39;load_model&#39; must not take any arguments and should return the black-box model. &#39;run_model&#39; must be a function that takes two arguments: the model and data respectively, and returns metastable state probabilities. Go to https://shams-mehdi.github.io/MDTerp/docs/examples/ for example files.</span>
 <span class="sd">            numeric_dict (dict): Python dictionary, each key represents the name of a numeric feature (non-periodic). Values should be lists with a single element with the index of the corresponding numpy array in np_data.</span>
 <span class="sd">            angle_dict (dict): Python dictionary, each key represents the name of an angular feature in [-pi, pi]. Values should be lists with a single element with the index of the corresponding numpy array in np_data.</span>
 <span class="sd">            sin_cos_dict (dict): Python dictionary, each key represents the name of an angular feature. Values should be lists with two elements with the sine, cosine indices respectively of the corresponding numpy array in np_data.</span>
@@ -945,7 +945,7 @@
       <tr>
         <td><code>model_function_loc</code></td>
         <td><code>str</code></td>
-        <td><p>Location of a human-readable file containing two functions called 'load_model()', and 'run_model()'. 'load_model' must not take any arguments and should return the black-box model. 'run_model' must be a function that takes two arguments: the model and data respectively, and returns metastable state probabilities. Go to https://shams-mehdi.github.io/MDTerp/examples/ for example files.</p></td>
+        <td><p>Location of a human-readable file containing two functions called 'load_model()', and 'run_model()'. 'load_model' must not take any arguments and should return the black-box model. 'run_model' must be a function that takes two arguments: the model and data respectively, and returns metastable state probabilities. Go to https://shams-mehdi.github.io/MDTerp/docs/examples/ for example files.</p></td>
         <td><em>required</em></td>
       </tr>
       <tr>
@@ -1039,7 +1039,7 @@
 
 <span class="sd">    Args:</span>
 <span class="sd">        np_data (np.ndarray): Black-box training data.</span>
-<span class="sd">        model_function_loc (str): Location of a human-readable file containing two functions called &#39;load_model()&#39;, and &#39;run_model()&#39;. &#39;load_model&#39; must not take any arguments and should return the black-box model. &#39;run_model&#39; must be a function that takes two arguments: the model and data respectively, and returns metastable state probabilities. Go to https://shams-mehdi.github.io/MDTerp/examples/ for example files.</span>
+<span class="sd">        model_function_loc (str): Location of a human-readable file containing two functions called &#39;load_model()&#39;, and &#39;run_model()&#39;. &#39;load_model&#39; must not take any arguments and should return the black-box model. &#39;run_model&#39; must be a function that takes two arguments: the model and data respectively, and returns metastable state probabilities. Go to https://shams-mehdi.github.io/MDTerp/docs/examples/ for example files.</span>
 <span class="sd">        numeric_dict (dict): Python dictionary, each key represents the name of a numeric feature (non-periodic). Values should be lists with a single element with the index of the corresponding numpy array in np_data.</span>
 <span class="sd">        angle_dict (dict): Python dictionary, each key represents the name of an angular feature in [-pi, pi]. Values should be lists with a single element with the index of the corresponding numpy array in np_data.</span>
 <span class="sd">        sin_cos_dict (dict): Python dictionary, each key represents the name of an angular feature. Values should be lists with two elements with the sine, cosine indices respectively of the corresponding numpy array in np_data.</span>
