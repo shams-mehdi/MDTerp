@@ -2,7 +2,7 @@
 
 
 [![image](https://img.shields.io/pypi/v/MDTerp.svg)](https://pypi.python.org/pypi/MDTerp)
-![MDTerp](../MDTerp_logo.png)
+![MDTerp](MDTerp_logo.png)
 
 **A python project for interpreting molecular dynamics (MD) trajectory metastable state classifications from machine-learning models**
 
@@ -14,3 +14,8 @@
 ## Features
 
 -   Scans blackbox AI classifier models trained on MD data for feature importance.
+
+## Demos
+
+-   [Notebook 1](docs/MDTerp_demo1.ipynb)
+-   [Notebook 2](docs/MDTerp_demo2.ipynb)
