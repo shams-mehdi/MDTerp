@@ -15,7 +15,7 @@
 ## Features
 
 -   Scans blackbox AI classifier models trained on MD data for feature importance.
--   
+  
 ## Installation
 
 To install MDTerp, run this command in your terminal:
