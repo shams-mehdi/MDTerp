@@ -1,0 +1,15 @@
+## Make all changes within the two following function definitions
+def load_model(): ## Do not change this line
+    from spib.spib import SPIB
+    from spib.utils import prepare_data, DataNormalize
+    import torch
+    model_loc = "your SPIB model location"
+    model = torch.load(model_loc, weights_only = False)
+
+    return model
+
+def run_model(model, data): ## Do not change this line
+    batch_size = 10240
+    labels, prediction, z_latent, _ = model.transform(data, batch_size=batch_size, to_numpy=True)
+
+    return prediction ## Must return state prediction probabilities

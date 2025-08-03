@@ -1,0 +1,16 @@
+## For simple models to be defined in this file (e.g., in this case), no need to change load_model() function. Simply define the model inside run_model().
+## For complicated saved models (e.g., created and saved using PyTorch), load them inside load_model().
+## Make all changes within the two following function definitions
+def load_model(): ## Do not change this line
+    model = 'Dummy'
+    return model
+
+def run_model(model, data): ## Do not change this line
+    import numpy as np
+    np.random.seed(0)
+    relevant_indices = [0, 1, 3, 8, 13, 16] ## MDTerp result should identify these feature indices as relevant with weights specified in the following line of code
+    relevant_weights = [3, 5, 8, 6, 4, 4.5]
+    data = np.average(np.sin(data[:, relevant_indices]), weights = relevant_weights, axis = 1)
+    predict = np.exp(-data)
+    prediction = np.column_stack((predict, 1- predict ))
+    return prediction ## Must return state prediction probabilities

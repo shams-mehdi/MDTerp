@@ -55,11 +55,10 @@ def input_summary(logger: Logger, numeric_dict: dict, angle_dict: dict, sin_cos_
     logger.info('Defined sin_cos features >>> ' + str(len(list(sin_cos_dict.keys()))) )
     logger.info('Number of samples in blackbox model training data >>> ' + str(np_data.shape[0]) )
     logger.info('Number of columns in blackbox model training data >>> ' + str(np_data.shape[1]) )
-
-    if np_data.shape[1] != len(list(numeric_dict.keys())) + len(list(angle_dict.keys())) + len(list(sin_cos_dict.keys()))//2:
+    if np_data.shape[1] != len(list(numeric_dict.keys())) + len(list(angle_dict.keys())) + len(list(sin_cos_dict.keys()))*2:
         logger.error('Assertion failure between provided feature dictionaries and input data!')
         raise ValueError('Assertion failure between provided feature dictionaries and input data!')
-
+    
     logger.info(100*'-')
 
 def picker_fn(prob: np.ndarray, threshold: float, point_max: int) -> dict:

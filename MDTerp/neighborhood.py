@@ -8,7 +8,7 @@ import scipy.stats as sst
 from typing import Union, List
 import numpy as np
 
-def generate_neighborhood(save_dir: str, numeric_dict: dict, angle_dict: dict, sin_cos_dict: dict, np_dat: np.ndarray, index: int, seed: int, num_samples: int, selected_features: Union[bool, List[int]] = False):
+def generate_neighborhood(save_dir: str, numeric_dict: dict, angle_dict: dict, sin_cos_dict: dict, np_dat: np.ndarray, index: int, seed: int, num_samples: int, perturbation_max: float, selected_features: Union[bool, List[int]] = False):
     """
     Function for creating a logger detailing MDTerp operations.
 
@@ -22,7 +22,7 @@ def generate_neighborhood(save_dir: str, numeric_dict: dict, angle_dict: dict, s
         seed (int): Random seed.
         num_samples (int): Size of the generated perturbed neighborhood.
         selected_features: If False (Default), perturbs all the features/columns. Otherwise, List of integers represent subset of features to perturb.
-
+        perturbation_max (float): Hyperparameter that sets a maximum on the perturbation. Perturbation is calculated by taking standard deviation of the dataset for a feature and multiplying with value drawn from a normal distribution ~N(0,1). However, sometimes this can result in very high perturbation if the standard deviation of the feature is unreasonably high. To solve this, a percentage (chosen by this hyperparameter) of the range of that feature is set as the maximum factor to be multiplied to the values drawn from ~N(0,1).
     Returns:
         list: List of np.ndarray indicating indices of numeric, angular, sin_cos features respectively.
         list: List of the combined name of the features.
@@ -75,7 +75,7 @@ def generate_neighborhood(save_dir: str, numeric_dict: dict, angle_dict: dict, s
 
           std_numeric = []
           for i in range(input_numeric.shape[1]):
-            std_numeric.append(np.std(input_numeric[:,i]))
+            std_numeric.append(min(np.std(input_numeric[:,i]), perturbation_max*(np.max(input_numeric[:,i]) - np.min(input_numeric[:,i]))))
         
           make_prediction_numeric = np.zeros((num_samples, input_numeric.shape[1]))
           TERP_numeric = np.zeros((num_samples, input_numeric.shape[1]))
@@ -102,7 +102,7 @@ def generate_neighborhood(save_dir: str, numeric_dict: dict, angle_dict: dict, s
 
       std_periodic = []
       for i in range(input_periodic.shape[1]):
-        std_periodic.append(sst.circstd(input_periodic[:,i], high = np.pi, low = -np.pi))
+        std_periodic.append(min(sst.circstd(input_periodic[:,i], high = np.pi, low = -np.pi), perturbation_max*(np.max(input_periodic[:,i]) - np.min(input_periodic[:,i]))))
 
       make_prediction_periodic = np.zeros((num_samples, input_periodic.shape[1]))
       TERP_periodic = np.zeros((num_samples, input_periodic.shape[1]))
@@ -118,7 +118,7 @@ def generate_neighborhood(save_dir: str, numeric_dict: dict, angle_dict: dict, s
             rand_data = np.random.normal(0, 1)
             make_prediction_periodic[i,j] = input_periodic[index,j] + std_periodic[j]*rand_data
             TERP_periodic[i,j] = rand_data
-            if make_prediction_periodic[i,j] < period_low or make_prediction_periodic[i,j] > period_high:
+            if make_prediction_periodic[i,j] < -np.pi or make_prediction_periodic[i,j] > np.pi:
               make_prediction_periodic[i,j] = np.arctan2(np.sin(make_prediction_periodic[i,j]), np.cos(make_prediction_periodic[i,j]))
 
 
@@ -138,7 +138,7 @@ def generate_neighborhood(save_dir: str, numeric_dict: dict, angle_dict: dict, s
       input_sin_cos = np.zeros((input_sin.shape[0], input_sin.shape[1]))
       for i in range(input_sin.shape[1]):
         input_sin_cos[:,i] = np.arctan2(input_sin[:,i], input_cos[:,i])
-        std_sin_cos.append(sst.circstd(input_sin_cos[:,i], high = period_high, low = period_low))
+        std_sin_cos.append(min(sst.circstd(input_sin_cos[:,i], high = np.pi, low = -np.pi), perturbation_max*(np.max(input_sin_cos[:,i]) - np.min(input_sin_cos[:,i]))))
 
       make_prediction_sin = np.zeros((num_samples, input_sin_cos.shape[1]))
       make_prediction_cos = np.zeros((num_samples, input_sin_cos.shape[1]))
