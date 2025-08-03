@@ -79,7 +79,7 @@ class run:
                 TERP_dat = np.load(tmp_dir + 'DATA_2/TERP_dat.npy')
                 importance = final_model(TERP_dat, state_probabilities3, unfaithfulness_threshold, given_indices, selected_features, seed)
                 importance_master[index] = [transition, importance]
-                logger.info("Completed generating " + str(point + 1) + "/" + str(len(points[transition])) + " results!" + "First round features kept >>> " + str(len(selected_features[0]) + len(selected_features[1]) + len(selected_features[2])) + ", Final round features kept >>> " + str(np.nonzero(importance)[0].shape[0]))
+                logger.info("Completed generating " + str(point + 1) + "/" + str(len(points[transition])) + " results!" + " First round features kept >>> " + str(len(selected_features[0]) + len(selected_features[1]) + len(selected_features[2])) + ", Final round features kept >>> " + str(np.nonzero(importance)[0].shape[0]))
             logger.info(100*'_')
 
         np.save(save_dir + 'MDTerp_feature_names.npy', indices_names)
