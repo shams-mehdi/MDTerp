@@ -14,7 +14,7 @@
 
 ## Features
 
--   Scans blackbox AI classifier models trained on MD data for feature importance.
+-   (Test) Scans blackbox AI classifier models trained on MD data for feature importance.
   
 ## Installation
 
