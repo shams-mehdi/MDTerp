@@ -28,7 +28,7 @@ def SGDreg(data: np.ndarray, labels: np.ndarray, seed: int, alpha: float = 1.0) 
     Function for implementing linear regression using stochastic gradient descent.
 
     Args:
-        data (np.ndarray): Numpy 2D array containing similarity weighted training data for the black-box model. Samples along rows and features along columns.
+        data (np.ndarray): Numpy 2D array containing the similarity-weighted training data for the black-box model. Samples along rows and features along columns.
         labels (np.ndarray): Numpy array containing metastable state prediction probabilities for a perturbed neighborhood corresponding to a specific sample. Includes the state for which the original sample has the highest probability.
         seed (int): Random seed.
         alpha (float): L2 norm of Ridge regression (Default: 1.0).
@@ -62,21 +62,21 @@ def interp(coef_array: np.ndarray) -> float:
       t += a[i]*np.log(a[i])
   return -t/np.log(coef_array.shape[0])
 
-def unfaithfulness_calc(k: int, N: int, data: np.ndarray, predict_proba: np.ndarray, best_parameters_master: list, labels: np.ndarray, best_interp_master: list, best_parameters_converted: list, best_unfaithfulness_master: list, tot_feat: int, all_features: np.ndarray, seed: int) -> None:
+def unfaithfulness_calc(k: int, N: int, data: np.ndarray, predict_proba: np.ndarray, best_parameters_master: list, labels: np.ndarray, best_interp_master: list, best_parameters_converted: list, best_unfaithfulness_master: list, tot_feat: int, selected_features: np.ndarray, seed: int) -> None:
   """
     Function for implementing linear regression using stochastic gradient descent.
 
     Args:
-        k (int): Number of features for building local linear model.
+        k (int): Number of features for building a surrogate, local, linear model.
         N (int): Number of features selected for detailed analysis.
-        data (np.ndarray): Numpy 2D array containing similarity weighted training data for the black-box model. Samples along rows and features along columns.
+        data (np.ndarray): Numpy 2D array containing the similarity-weighted training data for the black-box model. Samples along rows and features along columns.
         predict_proba (np.ndarray): Numpy array containing metastable state prediction probabilities for a perturbed neighborhood corresponding to a specific sample. Includes the state for which the original sample has the highest probability.
         best_parameters_master (list): List of lists that saves the best fit coefficients for linear models built using k=1, .., N features.
         best_interp_master (list): List that saves the interpretation entropy for the linear models built using k=1,...,N features.
-        best_parameters_converted (list): List of lists that saves the best fit coefficients for linear models built using k=1, .., N features, and imputes the discarded features in initial MDTerp round with 0 importance to preserve feature ID.
-        best_unfaithfulness_master (list): List that saves the unfaithfulness of the best fit linear models built using k=1, ..., N features.
-        tot_feat (int): Total number of features in the dataset including both discarded features and features under analysis.
-        all_features (np.ndarray): Indices of the features selected for detailed MDTerp analysis.
+        best_parameters_converted (list): List of lists that saves the best fit coefficients for linear models built using k=1, .., N features, and imputes the discarded features in the initial MDTerp round with 0 importance to preserve feature ID.
+        best_unfaithfulness_master (list): List that saves the unfaithfulness of the best-fit linear models built using k=1, ..., N features.
+        tot_feat (int): Total number of features in the dataset.
+        selected_features (np.ndarray): Indices of the features selected for detailed MDTerp analysis.
         seed (int): Random seed.
         
     Returns:
@@ -112,7 +112,7 @@ def unfaithfulness_calc(k: int, N: int, data: np.ndarray, predict_proba: np.ndar
 
   temp_coef_1 = TERP_SGD_parameters[best_model][:-1]
   temp_coef_2 = np.zeros((tot_feat))
-  temp_coef_2[all_features] = copy.deepcopy(temp_coef_1)
+  temp_coef_2[selected_features] = copy.deepcopy(temp_coef_1)
   best_parameters_converted.append(temp_coef_2)
   best_unfaithfulness_master.append(TERP_SGD_unfaithfulness[best_model])
 
@@ -120,7 +120,7 @@ def unfaithfulness_calc(k: int, N: int, data: np.ndarray, predict_proba: np.ndar
 
 def zeta(U: np.ndarray,S: np.ndarray,theta: float) -> np.ndarray:
   """
-    Function for computing interpretation free energy.
+    Function for computing the interpretation free energy.
 
     Args:
         U (np.ndarray): Numpy array with unfaithfulness of the best models for number of features, k = 1, ..., N.
@@ -134,7 +134,7 @@ def zeta(U: np.ndarray,S: np.ndarray,theta: float) -> np.ndarray:
 
 def charac_theta(d_U: np.ndarray,d_S: np.ndarray) -> np.ndarray:
   """
-    Function for computing change in unfaithfulness per unit change in interpretation entropy as number of features used to build linear model increases by 1.
+    Function for computing change in unfaithfulness per unit change in interpretation entropy as the number of features used to build a linear model increases by 1.
 
     Args:
         d_U (np.ndarray): Change in unfaithfulness with increasing features in linear models.
@@ -145,30 +145,21 @@ def charac_theta(d_U: np.ndarray,d_S: np.ndarray) -> np.ndarray:
   """
   return -d_U/d_S
     
-def final_model(neighborhood_data: np.ndarray, pred_proba: np.ndarray, unf_threshold: float, given_indices: np.ndarray, selected_features: np.ndarray, seed:int) -> np.ndarray:
+def final_model(neighborhood_data: np.ndarray, pred_proba: np.ndarray, unf_threshold: float, feature_type_indices: np.ndarray, selected_features: np.ndarray, seed:int) -> np.ndarray:
     """
     Function for computing final feature importance by implementing forward feature selection.
 
     Args:
         neighborhood_data (np.ndarray): Perturbed data generated by MDTerp.neighborhood.py.
         pred_proba (np.ndarray): Metastable state probabilities obtained from the black-box.
-        unf_threshold (float): Hyperparameter setting a lower limit on unfaithafulness. Forward feature selection ends when unfaithfulness reaches lower than this threshold.
-        given_indices (np.ndarray): Indices of the features to perform final round of MDTerp on.
+        unf_threshold (float): Hyperparameter setting a lower limit on model unfaithafulness. Forward feature selection ends when unfaithfulness reaches lower than this threshold.
+        feature_type_indices (np.ndarray): Indices of the features to perform the final round of MDTerp on.
         seed (int): Random seed.
         
     Returns:
         np.ndarray: Normalized feature importance.
     """
-    tot_feat = given_indices[0].shape[0] + given_indices[1].shape[0] + given_indices[2].shape[0]
-    
-    all_features = []
-    for i in range(len(selected_features[0])):
-        all_features.append(selected_features[0][i])
-    for i in range(len(selected_features[1])):
-        all_features.append(selected_features[1][i])  
-    for i in range(len(selected_features[2])):
-        all_features.append(given_indices[0].shape[0] + given_indices[1].shape[0] + np.where(selected_features[2][i][0] == given_indices[2])[0][0])  
-
+    tot_feat = feature_type_indices[0].shape[0] + feature_type_indices[1].shape[0] + feature_type_indices[2].shape[0] + feature_type_indices[3].shape[0]
     k_max = neighborhood_data.shape[1]
 
     explain_class = np.argmax(pred_proba[0,:])
@@ -196,7 +187,7 @@ def final_model(neighborhood_data: np.ndarray, pred_proba: np.ndarray, unf_thres
     k_array = np.arange(1,k_max+1)
     
     for k in k_array:
-      unfaithfulness_calc(k, N, data, predict_proba, best_parameters_master, labels, best_interp_master, best_parameters_converted, best_unfaithfulness_master, tot_feat, all_features, seed)
+      unfaithfulness_calc(k, N, data, predict_proba, best_parameters_master, labels, best_interp_master, best_parameters_converted, best_unfaithfulness_master, tot_feat, selected_features, seed)
 
 
     optimal_k = 1
@@ -216,11 +207,11 @@ def final_model(neighborhood_data: np.ndarray, pred_proba: np.ndarray, unf_thres
     
       d_U_lst = []
       d_S_lst = []
-      for i in range(1, len(all_features)):
+      for i in range(1, len(selected_features)):
         d_U_lst.append(best_unfaithfulness_master[i] - best_unfaithfulness_master[i-1])
         d_S_lst.append(best_interp_master[i] - best_interp_master[i-1])
     
-      for i in range(len(all_features)-1):
+      for i in range(len(selected_features)-1):
         charac_theta_mast.append(charac_theta(d_U_lst[i], d_S_lst[i]))
       
       range_theta_mast = []
@@ -229,4 +220,4 @@ def final_model(neighborhood_data: np.ndarray, pred_proba: np.ndarray, unf_thres
     
       prime_model = np.argmin(np.array(range_theta_mast))
     
-    return np.absolute(np.array(best_parameters_converted)[prime_model+1])/np.sum(np.absolute(np.array(best_parameters_converted)[prime_model+1]))
+    return np.absolute(np.array(best_parameters_converted)[prime_model+1])

@@ -7,7 +7,6 @@ import numpy as np
 from collections import defaultdict
 import pickle
 import os
-import matplotlib.pyplot as plt
 
 def log_maker(save_dir: str) -> Logger:
     """
@@ -40,9 +39,9 @@ def input_summary(logger: Logger, numeric_dict: dict, angle_dict: dict, sin_cos_
 
     Args:
         logger (Logger): Logger object created using Python's built-in logging module.
-        numeric_dict (dict): Python dictionary, each key represents the name of a numeric feature (non-periodic). Values should be lists with a single element with the index of the corresponding numpy array in np_data.
+        numeric_dict (dict): Python dictionary, each key represents the name of a numeric feature (non-periodic). Values should be lists with a single element using the index of the corresponding numpy array in np_data.
         angle_dict (dict): Python dictionary, each key represents the name of an angular feature in [-pi, pi]. Values should be lists with a single element with the index of the corresponding numpy array in np_data.
-        sin_cos_dict (dict): Python dictionary, each key represents the name of an angular feature. Values should be lists with two elements with the sine, cosine indices respectively of the corresponding numpy array in np_data.
+        sin_cos_dict (dict): Python dictionary, each key represents the name of an angular feature. Values should be lists with two elements using the sine, cosine indices of the corresponding numpy array in np_data.
         save_dir (str): Location to save MDTerp results.
         np_data (np.ndarray): Numpy 2D array containing training data for the black-box model. Samples along rows and features along columns.
         
@@ -63,15 +62,15 @@ def input_summary(logger: Logger, numeric_dict: dict, angle_dict: dict, sin_cos_
 
 def picker_fn(prob: np.ndarray, threshold: float, point_max: int) -> dict:
     """
-    Function for picking points at the transition state ensemble. Uses provided data and metastable state probability from black-box.
+    Function for picking points at the transition state ensemble. Uses provided data and metastable state probability from the black-box model.
 
     Args:
-        prob (np.ndarray): Numpy 2D array containing metastable state prediction probabilities from the black-box model. Rows represent samples and number of columns equal to number of states. Each row should sum to 1.
-        threshold (float): Threshold for identifying if a sample belongs to transition state predicted by the black-box model. If metastable state probability > threshold for two different classes for a specific sample, it's suitable for analysis.
-        point_max (int): If too many suitable points exist for a specific transition (e.g., transition between metastable state 3 and 8), point_max sets maximum number of points chosen for analysis. Points chosen from a uniform distribution.
+        prob (np.ndarray): Numpy 2D array containing metastable state prediction probabilities from the black-box model. Rows represent samples, and the number of columns represents the number of states. Each row should sum to 1.
+        threshold (float): Threshold for identifying if a sample belongs to a transition state predicted by the black-box model. If the metastable state probability > threshold for two different classes for a specific sample, it's suitable for analysis.
+        point_max (int): If too many suitable points exist for a specific transition (e.g., transition between metastable state 3 and 8), point_max sets the maximum number of points chosen for analysis. Points are chosen from a uniform distribution.
         
     Returns:
-        dict : Dictionary with keys representing detected transitions. E.g., key '3_8' means transition between index 3 and index 8 in according to the prob array. Values represent chosen samples/rows in the provided dataset which undergo this transition.
+        dict: Dictionary with keys representing detected transitions. E.g., key '3_8' means transition between index 3 and index 8 according to the prob array. Values represent chosen samples/rows in the provided dataset undergoing this transition.
     """
     transition_dict = defaultdict(list)
     for i in range(prob.shape[0]):
@@ -84,50 +83,83 @@ def picker_fn(prob: np.ndarray, threshold: float, point_max: int) -> dict:
     
     return transition_dict
 
-def summary(feature_names_loc: str, all_result_loc: str, save_fig_dir: str, top_k: int = 10, fs: int = 12, dpi: int = 300) -> dict:
+def transition_summary(all_result_loc: str, importance_coverage: float = 0.8) -> dict:
     """
     Function summarizing MDTerp results for all the transitions present in the dataset.
 
     Args:
-        feature_names_loc (str): Location of the saved combined (all) feature names.
         all_results_loc (str): Location to save MDTerp results.
-        save_fig_dir (str): Location to save MDTerp results figures.
-        top_k (int): Number of top ranked features to show in summary figures.
-        fs (int): Fontsize of the labels in generated figures.
-        dpi (int): DPI of the generated figures
+        importance_coverage (float): For a specific transition, sets a cutoff for the sum of the most important features in descending order.
         
     Returns:
-        dict : Dictionary with keys representing detected transitions. E.g., key '3_8' means transition between index 3 and index 8 in according to the prob array. Values are lists representing feature importance with length of the list equaling number of features in the provided dataset.
+        dict: Dictionary with keys representing detected transitions. E.g., key '3_8' means transition between index 3 and index 8 according to the prob array. Values are lists representing mean and standard deviations of the feature importance using the length of the list equaling the number of features in the provided dataset for that transition.
     """
-    feature_names = np.load(feature_names_loc)
-    os.makedirs(save_fig_dir, exist_ok = True)
     with open(all_result_loc, 'rb') as f:
         loaded_dict = pickle.load(f)  
+    # Save all the unique transitions
     transitions = []
     for ii in loaded_dict:
         transitions.append(loaded_dict[ii][0])
+    # Save summary results for each transition
     summary_imp = {}
     for ii in np.unique(transitions):
         summary_imp[ii] = []
     for ii in loaded_dict:
         summary_imp[loaded_dict[ii][0]].append(loaded_dict[ii][1])
     for ii in summary_imp:
-        summary_imp[ii] = np.mean(summary_imp[ii], axis = 0)
-        tmp_vals = summary_imp[ii]
-        trim_args = np.argsort(tmp_vals)[::-1][:top_k]
-        trim_vals = np.sort(tmp_vals)[::-1][:top_k]
-        fig, ax = plt.subplots(figsize = (8,8))
-        ax.barh(np.arange(trim_vals.shape[0]), trim_vals)
-        ax.set_title('Importance coverage: ' + str(int(100*np.sum(trim_vals)/np.sum(tmp_vals))) + '%', fontsize = fs)
-        ax.tick_params(axis='both', which='major', labelsize=fs)
-        ax.tick_params(axis='both', which='minor', labelsize=int(fs/2))
-        ax.set_yticks(np.arange(trim_args.shape[0]))
-        ax.set_yticklabels(np.array(feature_names)[trim_args])
-        fig.tight_layout()
-        fig.savefig(save_fig_dir + '/' + ii + '.png', dpi = dpi, transparent = True)
+        tmp_a = np.mean(summary_imp[ii], axis = 0)
+        # Normalize results for the transition
+        normalization = np.sum(tmp_a)
+        tmp_a = tmp_a/normalization
+        tmp_b = np.std(summary_imp[ii], axis = 0)/normalization
+
+        trim_args = np.argsort(tmp_a)[::-1]
+        trim_vals = np.sort(tmp_a)[::-1]
+        # Discard irrelevant features for each transition, based on the importance_coverage hyperparameter
+        cutoff_k = 0
+        current_coverage = 0
+        while current_coverage < importance_coverage:
+          try:  
+            current_coverage += trim_vals[cutoff_k]
+            cutoff_k += 1
+          except:
+            break
+
+        tmp_a[trim_args[cutoff_k:]] = 0
+        tmp_b[trim_args[cutoff_k:]] = 0
         
+        summary_imp[ii] = [tmp_a, tmp_b]
+
     return summary_imp
     
+def dominant_feature(all_result_loc: str, n: int = 0) -> dict:
+    """
+    Function summarizing MDTerp results for all the transitions present in the dataset.
 
+    Args:
+        all_results_loc (str): Location to save MDTerp results.
+        importance_coverage (float): For a specific transition, sets a cutoff for the sum of the most important features in descending order.
+        
+    Returns:
+        dict: Dictionary with keys representing detected transitions. E.g., key '3_8' means transition between index 3 and index 8 according to the prob array. Values are lists representing feature importance using the length of the list equaling the number of features in the provided dataset.
+    """
+    with open(all_result_loc, 'rb') as f:
+        loaded_dict = pickle.load(f)  
 
-    
+    for ii in loaded_dict:
+        tmp_c = loaded_dict[ii][1]
+        loaded_dict[ii] = np.argsort(tmp_c)[::-1][n]
+
+    return loaded_dict
+
+def make_result(given_indices, indices_names, importance):
+    tmp = []
+    for i in range(given_indices[0].shape[0]):
+        tmp.append(importance[given_indices[0][i]])
+        
+    for i in range(given_indices[1].shape[0]):
+        tmp.append(importance[given_indices[1][i]])
+
+    for i in range(given_indices[2].shape[0]):
+        tmp.append((importance[given_indices[2][i]] + importance[given_indices[3][i]]))
+    return tmp
