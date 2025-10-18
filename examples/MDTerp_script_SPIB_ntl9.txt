@@ -3,7 +3,7 @@ def load_model(): ## Do not change this line
     from spib.spib import SPIB
     from spib.utils import prepare_data, DataNormalize
     import torch
-    model_loc = "your SPIB model location"
+    model_loc = "./MDTerp_files/data_model/SPIB_ntl9.model"
     model = torch.load(model_loc, weights_only = False)
 
     return model
