@@ -2,7 +2,7 @@
 ## Make all changes within the two following function definitions
 def load_model(): ## Do not change this line
     import torch
-    model = torch.load('./docs/examples/VAMPNets_model', weights_only = False)
+    model = torch.load('./MDTerp_files/scripts/VAMPnets.model', weights_only = False)
     return model
 
 def run_model(model, data): ## Do not change this line

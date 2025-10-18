@@ -219,5 +219,4 @@ def final_model(neighborhood_data: np.ndarray, pred_proba: np.ndarray, unf_thres
         range_theta_mast.append(np.array(charac_theta_mast)[i]-np.array(charac_theta_mast)[i-1])
     
       prime_model = np.argmin(np.array(range_theta_mast))
-    
     return np.absolute(np.array(best_parameters_converted)[prime_model+1])
