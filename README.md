@@ -23,6 +23,8 @@ MDTerp uses thermodynamics-inspired explanations to provide feature importance f
 -   Multi-CPU parallel processing for faster analysis
 -   Automatic checkpointing and resume functionality for long-running analyses
 -   Adaptive hyperparameter tuning (prob_threshold auto-tuning)
+-   Comprehensive visualization utilities for analyzing results
+-   Statistical analysis tools for comparing transitions and extracting insights
   
 ## Installation
 

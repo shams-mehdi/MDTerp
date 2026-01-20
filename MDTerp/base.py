@@ -17,7 +17,6 @@ import pickle
 import multiprocessing as mp
 from typing import Dict, Optional, Tuple
 from logging import Logger
-from functools import partial
 
 from MDTerp.neighborhood import generate_neighborhood
 from MDTerp.utils import log_maker, input_summary, picker_fn, make_result
@@ -495,39 +494,33 @@ class run:
         Yields:
             Analysis results as they complete
         """
-        # Create worker function with fixed parameters
-        worker_fn = partial(
-            _analyze_sample_worker,
-            np_data=self.np_data,
-            model_function_loc=self.model_function_loc,
-            numeric_dict=self.numeric_dict,
-            angle_dict=self.angle_dict,
-            sin_cos_dict=self.sin_cos_dict,
-            save_dir_base=self.save_dir,
-            seed=self.seed,
-            num_samples=self.num_samples,
-            cutoff=self.cutoff,
-            unfaithfulness_threshold=self.unfaithfulness_threshold,
-            periodicity_upper=self.periodicity_upper,
-            periodicity_lower=self.periodicity_lower,
-            alpha=self.alpha
-        )
-
         # Create pool and process samples
         with mp.Pool(processes=self.n_jobs) as pool:
-            # Prepare arguments for each work item
+            # Prepare arguments for each work item - pass all parameters directly
             worker_args = [
-                (sample_idx, trans_name, worker_id)
+                (
+                    sample_idx,
+                    trans_name,
+                    self.np_data,
+                    self.model_function_loc,
+                    self.numeric_dict,
+                    self.angle_dict,
+                    self.sin_cos_dict,
+                    self.save_dir,
+                    self.seed,
+                    self.num_samples,
+                    self.cutoff,
+                    self.unfaithfulness_threshold,
+                    self.periodicity_upper,
+                    self.periodicity_lower,
+                    self.alpha,
+                    worker_id
+                )
                 for worker_id, (sample_idx, trans_name) in enumerate(work_items)
             ]
 
-            # Use starmap to unpack arguments
-            results = pool.starmap(
-                lambda sample_idx, trans_name, worker_id: worker_fn(
-                    sample_idx, trans_name, worker_id
-                ),
-                worker_args
-            )
+            # Use starmap to unpack arguments directly to worker function
+            results = pool.starmap(_analyze_sample_worker, worker_args)
 
             # Yield results
             for result in results:

@@ -6,4 +6,15 @@ from MDTerp.base import run
 from MDTerp.checkpoint import CheckpointManager
 from MDTerp.utils import transition_summary, dominant_feature
 
-__all__ = ['run', 'CheckpointManager', 'transition_summary', 'dominant_feature']
+# Visualization and analysis modules
+from MDTerp import visualization
+from MDTerp import analysis
+
+__all__ = [
+    'run',
+    'CheckpointManager',
+    'transition_summary',
+    'dominant_feature',
+    'visualization',
+    'analysis'
+]

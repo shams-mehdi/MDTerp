@@ -7,7 +7,14 @@
 -   **Multi-CPU parallel processing**: New `n_jobs` parameter enables parallel analysis across multiple CPU cores for significant speedup
 -   **Checkpointing and resume**: Robust checkpoint system allows seamless resumption of interrupted analyses without data loss
 -   **Auto-tuning of prob_threshold**: Adaptive algorithm automatically tunes `prob_threshold` based on `point_max` when set to `None`
+-   **Visualization utilities**: Comprehensive visualization module with 5 plotting functions for analyzing results
+-   **Analysis helpers**: Statistical analysis tools for comparing transitions and extracting insights
 -   **Comprehensive code refactoring**: Improved code organization, documentation, and maintainability throughout the codebase
+
+**New Modules**:
+
+-   `MDTerp.visualization`: Feature importance plots, heatmaps, transition comparisons, and automated report generation
+-   `MDTerp.analysis`: Statistical analysis, transition comparison, consensus feature identification, and CSV export
 
 **API Changes**:
 
@@ -16,6 +23,7 @@
 -   Made `prob_threshold` optional in `MDTerp.run()` (default: None triggers auto-tuning)
 -   New `CheckpointManager` class exported for advanced checkpoint management
 -   Exported `transition_summary` and `dominant_feature` utility functions
+-   Exported `visualization` and `analysis` modules for result analysis
 
 **Improvements**:
 
