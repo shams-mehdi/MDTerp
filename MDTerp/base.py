@@ -14,14 +14,120 @@ import numpy as np
 import os
 import shutil
 import pickle
+import multiprocessing as mp
 from typing import Dict, Optional, Tuple
 from logging import Logger
+from functools import partial
 
 from MDTerp.neighborhood import generate_neighborhood
 from MDTerp.utils import log_maker, input_summary, picker_fn, make_result
 from MDTerp.init_analysis import init_model
 from MDTerp.final_analysis import final_model
 from MDTerp.checkpoint import CheckpointManager
+
+
+def _analyze_sample_worker(
+    sample_index: int,
+    transition_name: str,
+    np_data: np.ndarray,
+    model_function_loc: str,
+    numeric_dict: Dict,
+    angle_dict: Dict,
+    sin_cos_dict: Dict,
+    save_dir_base: str,
+    seed: int,
+    num_samples: int,
+    cutoff: int,
+    unfaithfulness_threshold: float,
+    periodicity_upper: float,
+    periodicity_lower: float,
+    alpha: float,
+    worker_id: int
+) -> Tuple[int, str, list, list, int, int]:
+    """
+    Worker function for parallel sample analysis.
+
+    This function is designed to be pickle-able for multiprocessing.
+    Each worker gets its own temporary directory to avoid file conflicts.
+
+    Args:
+        sample_index: Index of sample to analyze
+        transition_name: Name of transition
+        np_data: Full training data array
+        model_function_loc: Path to model file
+        numeric_dict: Numeric feature dictionary
+        angle_dict: Angular feature dictionary
+        sin_cos_dict: Sin/cos feature dictionary
+        save_dir_base: Base directory for results
+        seed: Random seed
+        num_samples: Number of perturbed samples
+        cutoff: Feature cutoff for stage 1
+        unfaithfulness_threshold: Threshold for forward selection
+        periodicity_upper: Upper periodicity bound
+        periodicity_lower: Lower periodicity bound
+        alpha: Ridge regression alpha
+        worker_id: Unique worker identifier
+
+    Returns:
+        Tuple of (sample_index, transition_name, importance, feature_names,
+                 n_selected, n_final)
+    """
+    # Create worker-specific temporary directory to avoid conflicts
+    worker_save_dir = os.path.join(save_dir_base, f'tmp_worker_{worker_id}_{sample_index}')
+    os.makedirs(worker_save_dir, exist_ok=True)
+
+    try:
+        # Load model
+        with open(model_function_loc, 'r') as file:
+            func_code = file.read()
+        local_ns = {}
+        exec(func_code, globals(), local_ns)
+        model = local_ns["load_model"]()
+        run_model_fn = local_ns["run_model"]
+
+        # Stage 1: Generate full neighborhood and run initial screening
+        feature_type_indices, feature_names = generate_neighborhood(
+            worker_save_dir, numeric_dict, angle_dict, sin_cos_dict,
+            np_data, sample_index, seed, num_samples,
+            np.array([]), periodicity_upper, periodicity_lower
+        )
+
+        neighborhood_data = np.load(worker_save_dir + '/DATA/make_prediction.npy')
+        state_probs_stage1 = run_model_fn(model, neighborhood_data)
+        terp_data_stage1 = np.load(worker_save_dir + '/DATA/TERP_dat.npy')
+
+        selected_features = init_model(
+            terp_data_stage1, state_probs_stage1, cutoff,
+            feature_type_indices, seed, alpha
+        )
+
+        # Stage 2: Generate refined neighborhood and compute final importance
+        generate_neighborhood(
+            worker_save_dir, numeric_dict, angle_dict, sin_cos_dict,
+            np_data, sample_index, seed, num_samples,
+            selected_features, periodicity_upper, periodicity_lower
+        )
+
+        neighborhood_data_refined = np.load(worker_save_dir + '/DATA_2/make_prediction.npy')
+        state_probs_stage2 = run_model_fn(model, neighborhood_data_refined)
+        terp_data_stage2 = np.load(worker_save_dir + '/DATA_2/TERP_dat.npy')
+
+        raw_importance = final_model(
+            terp_data_stage2, state_probs_stage2, unfaithfulness_threshold,
+            feature_type_indices, selected_features, seed
+        )
+
+        importance = make_result(feature_type_indices, feature_names, raw_importance)
+
+        n_selected = len(selected_features)
+        n_final = np.nonzero(importance)[0].shape[0]
+
+        return (sample_index, transition_name, importance, feature_names, n_selected, n_final)
+
+    finally:
+        # Cleanup worker temporary directory
+        if os.path.exists(worker_save_dir):
+            shutil.rmtree(worker_save_dir)
 
 
 class run:
@@ -51,7 +157,8 @@ class run:
         periodicity_upper: float = np.pi,
         periodicity_lower: float = -np.pi,
         alpha: float = 1.0,
-        resume: bool = True
+        resume: bool = True,
+        n_jobs: Optional[int] = None
     ) -> None:
         """
         Initialize and run MDTerp feature importance analysis.
@@ -89,6 +196,9 @@ class run:
             alpha: L2 regularization parameter for Ridge regression.
             resume: If True, resume from checkpoint if available. If False,
                 start fresh analysis (overwriting any existing checkpoint).
+            n_jobs: Number of parallel processes to use for analysis. If None,
+                uses all available CPUs. Set to 1 for serial execution. Set to
+                -1 to use all CPUs minus one.
 
         Returns:
             None. Results are saved to save_dir:
@@ -117,10 +227,19 @@ class run:
         self.alpha = alpha
         self.resume = resume
 
+        # Determine number of parallel jobs
+        if n_jobs is None:
+            self.n_jobs = mp.cpu_count()
+        elif n_jobs == -1:
+            self.n_jobs = max(1, mp.cpu_count() - 1)
+        else:
+            self.n_jobs = max(1, n_jobs)
+
         # Initialize results directory and logger
         os.makedirs(save_dir, exist_ok=True)
         self.logger = log_maker(save_dir)
         input_summary(self.logger, numeric_dict, angle_dict, sin_cos_dict, save_dir, np_data)
+        self.logger.info(f"Parallel processing: using {self.n_jobs} worker(s)")
 
         # Initialize checkpoint manager
         self.checkpoint_manager = CheckpointManager(save_dir)
@@ -250,58 +369,45 @@ class run:
         self,
         sample_index: int,
         transition_name: str
-    ) -> Tuple[str, list]:
+    ) -> Tuple[int, str, list, list, int, int]:
         """
-        Analyze a single transition point for feature importance.
+        Analyze a single transition point for feature importance (serial mode).
+
+        This is a wrapper around the worker function for serial execution.
 
         Args:
             sample_index: Index of the sample in np_data
             transition_name: Name of the transition (e.g., "0_1")
 
         Returns:
-            Tuple of (transition_name, feature_importance_list)
+            Tuple of (sample_index, transition_name, importance, feature_names,
+                     n_selected, n_final)
         """
-        # Stage 1: Generate full neighborhood and run initial screening
-        feature_type_indices, feature_names = generate_neighborhood(
-            self.save_dir, self.numeric_dict, self.angle_dict, self.sin_cos_dict,
-            self.np_data, sample_index, self.seed, self.num_samples,
-            np.array([]), self.periodicity_upper, self.periodicity_lower
+        return _analyze_sample_worker(
+            sample_index=sample_index,
+            transition_name=transition_name,
+            np_data=self.np_data,
+            model_function_loc=self.model_function_loc,
+            numeric_dict=self.numeric_dict,
+            angle_dict=self.angle_dict,
+            sin_cos_dict=self.sin_cos_dict,
+            save_dir_base=self.save_dir,
+            seed=self.seed,
+            num_samples=self.num_samples,
+            cutoff=self.cutoff,
+            unfaithfulness_threshold=self.unfaithfulness_threshold,
+            periodicity_upper=self.periodicity_upper,
+            periodicity_lower=self.periodicity_lower,
+            alpha=self.alpha,
+            worker_id=0  # Use worker_id 0 for serial execution
         )
-
-        neighborhood_data = np.load(self.save_dir + 'DATA/make_prediction.npy')
-        state_probs_stage1 = self.run_model_fn(self.model, neighborhood_data)
-        terp_data_stage1 = np.load(self.save_dir + 'DATA/TERP_dat.npy')
-
-        selected_features = init_model(
-            terp_data_stage1, state_probs_stage1, self.cutoff,
-            feature_type_indices, self.seed, self.alpha
-        )
-
-        # Stage 2: Generate refined neighborhood and compute final importance
-        generate_neighborhood(
-            self.save_dir, self.numeric_dict, self.angle_dict, self.sin_cos_dict,
-            self.np_data, sample_index, self.seed, self.num_samples,
-            selected_features, self.periodicity_upper, self.periodicity_lower
-        )
-
-        neighborhood_data_refined = np.load(self.save_dir + 'DATA_2/make_prediction.npy')
-        state_probs_stage2 = self.run_model_fn(self.model, neighborhood_data_refined)
-        terp_data_stage2 = np.load(self.save_dir + 'DATA_2/TERP_dat.npy')
-
-        raw_importance = final_model(
-            terp_data_stage2, state_probs_stage2, self.unfaithfulness_threshold,
-            feature_type_indices, selected_features, self.seed
-        )
-
-        importance = make_result(feature_type_indices, feature_names, raw_importance)
-
-        return transition_name, importance, feature_names, len(selected_features), np.nonzero(importance)[0].shape[0]
 
     def _analyze_all_transitions(self) -> Tuple[Dict, list]:
         """
         Analyze all identified transitions for feature importance.
 
-        Supports resumption from checkpoints - skips already completed samples.
+        Supports resumption from checkpoints and parallel processing.
+        Uses multiprocessing when n_jobs > 1, otherwise runs serially.
 
         Returns:
             Tuple of (results_dict, feature_names_list)
@@ -322,44 +428,110 @@ class run:
             self.logger.info("All transitions already completed!")
             return importance_results, feature_names
 
-        total_remaining = sum(len(samples) for samples in remaining_transitions.values())
-        total_completed = 0
+        # Build list of all samples to analyze
+        all_work_items = []
+        for transition_name, sample_indices in remaining_transitions.items():
+            for sample_index in sample_indices:
+                all_work_items.append((sample_index, transition_name))
 
-        for transition_name in remaining_transitions:
-            self.logger.info(f"Starting transition >>> {transition_name}")
+        total_remaining = len(all_work_items)
+        self.logger.info(f"Total samples to analyze: {total_remaining}")
 
-            sample_indices = remaining_transitions[transition_name]
-            num_samples = len(sample_indices)
+        if self.n_jobs == 1:
+            # Serial execution
+            self.logger.info("Running in serial mode")
+            results_iter = self._analyze_serial(all_work_items)
+        else:
+            # Parallel execution
+            self.logger.info(f"Running in parallel mode with {self.n_jobs} workers")
+            results_iter = self._analyze_parallel(all_work_items)
 
-            for point_idx, sample_index in enumerate(sample_indices):
-                trans_name, importance, feat_names, n_selected, n_final = \
-                    self._analyze_single_point(sample_index, transition_name)
+        # Process results as they complete
+        for idx, (sample_index, trans_name, importance, feat_names, n_selected, n_final) in enumerate(results_iter):
+            # Store feature names from first analysis
+            if feature_names is None:
+                feature_names = feat_names
 
-                # Store feature names from first analysis
-                if feature_names is None:
-                    feature_names = feat_names
+            importance_results[sample_index] = [trans_name, importance]
+            completed_samples.add(sample_index)
 
-                importance_results[sample_index] = [trans_name, importance]
-                completed_samples.add(sample_index)
-                total_completed += 1
+            # Save checkpoint after each sample
+            self.checkpoint_manager.save_checkpoint(
+                importance_results,
+                feature_names,
+                completed_samples
+            )
 
-                # Save checkpoint after each sample
-                self.checkpoint_manager.save_checkpoint(
-                    importance_results,
-                    feature_names,
-                    completed_samples
-                )
+            self.logger.info(
+                f"Completed {idx + 1}/{total_remaining} samples | "
+                f"Transition {trans_name} | "
+                f"Stage 1 features: {n_selected}, Stage 2 features: {n_final}"
+            )
 
-                self.logger.info(
-                    f"Completed {point_idx + 1}/{num_samples} for this transition "
-                    f"({total_completed}/{total_remaining} total remaining) | "
-                    f"Stage 1 features kept >>> {n_selected}, "
-                    f"Stage 2 features kept >>> {n_final}"
-                )
-
-            self.logger.info(100 * '_')
-
+        self.logger.info(100 * '_')
         return importance_results, feature_names
+
+    def _analyze_serial(self, work_items):
+        """
+        Analyze samples serially (one at a time).
+
+        Args:
+            work_items: List of (sample_index, transition_name) tuples
+
+        Yields:
+            Analysis results for each sample
+        """
+        for sample_index, transition_name in work_items:
+            result = self._analyze_single_point(sample_index, transition_name)
+            yield result
+
+    def _analyze_parallel(self, work_items):
+        """
+        Analyze samples in parallel using multiprocessing.
+
+        Args:
+            work_items: List of (sample_index, transition_name) tuples
+
+        Yields:
+            Analysis results as they complete
+        """
+        # Create worker function with fixed parameters
+        worker_fn = partial(
+            _analyze_sample_worker,
+            np_data=self.np_data,
+            model_function_loc=self.model_function_loc,
+            numeric_dict=self.numeric_dict,
+            angle_dict=self.angle_dict,
+            sin_cos_dict=self.sin_cos_dict,
+            save_dir_base=self.save_dir,
+            seed=self.seed,
+            num_samples=self.num_samples,
+            cutoff=self.cutoff,
+            unfaithfulness_threshold=self.unfaithfulness_threshold,
+            periodicity_upper=self.periodicity_upper,
+            periodicity_lower=self.periodicity_lower,
+            alpha=self.alpha
+        )
+
+        # Create pool and process samples
+        with mp.Pool(processes=self.n_jobs) as pool:
+            # Prepare arguments for each work item
+            worker_args = [
+                (sample_idx, trans_name, worker_id)
+                for worker_id, (sample_idx, trans_name) in enumerate(work_items)
+            ]
+
+            # Use starmap to unpack arguments
+            results = pool.starmap(
+                lambda sample_idx, trans_name, worker_id: worker_fn(
+                    sample_idx, trans_name, worker_id
+                ),
+                worker_args
+            )
+
+            # Yield results
+            for result in results:
+                yield result
 
     def _save_results(self) -> None:
         """
@@ -397,6 +569,17 @@ class run:
         for temp_dir in temp_dirs:
             if os.path.exists(temp_dir):
                 shutil.rmtree(temp_dir)
+
+        # Clean up any worker temporary directories (in case of incomplete cleanup)
+        try:
+            for item in os.listdir(self.save_dir):
+                if item.startswith('tmp_worker_'):
+                    worker_dir = os.path.join(self.save_dir, item)
+                    if os.path.isdir(worker_dir):
+                        shutil.rmtree(worker_dir)
+                        self.logger.info(f"Cleaned up orphaned worker directory: {item}")
+        except Exception as e:
+            self.logger.warning(f"Could not clean up worker directories: {e}")
 
         self.logger.info("Completed!!!")
 
