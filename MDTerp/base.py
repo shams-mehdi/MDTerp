@@ -21,6 +21,7 @@ from MDTerp.neighborhood import generate_neighborhood
 from MDTerp.utils import log_maker, input_summary, picker_fn, make_result
 from MDTerp.init_analysis import init_model
 from MDTerp.final_analysis import final_model
+from MDTerp.checkpoint import CheckpointManager
 
 
 class run:
@@ -49,7 +50,8 @@ class run:
         unfaithfulness_threshold: float = 0.01,
         periodicity_upper: float = np.pi,
         periodicity_lower: float = -np.pi,
-        alpha: float = 1.0
+        alpha: float = 1.0,
+        resume: bool = True
     ) -> None:
         """
         Initialize and run MDTerp feature importance analysis.
@@ -85,6 +87,8 @@ class run:
             periodicity_upper: Upper bound for angular feature periodicity.
             periodicity_lower: Lower bound for angular feature periodicity.
             alpha: L2 regularization parameter for Ridge regression.
+            resume: If True, resume from checkpoint if available. If False,
+                start fresh analysis (overwriting any existing checkpoint).
 
         Returns:
             None. Results are saved to save_dir:
@@ -111,11 +115,20 @@ class run:
         self.periodicity_upper = periodicity_upper
         self.periodicity_lower = periodicity_lower
         self.alpha = alpha
+        self.resume = resume
 
         # Initialize results directory and logger
         os.makedirs(save_dir, exist_ok=True)
         self.logger = log_maker(save_dir)
         input_summary(self.logger, numeric_dict, angle_dict, sin_cos_dict, save_dir, np_data)
+
+        # Initialize checkpoint manager
+        self.checkpoint_manager = CheckpointManager(save_dir)
+        if not resume:
+            self.checkpoint_manager.clear_checkpoint()
+            self.logger.info("Starting fresh analysis (resume=False)")
+        else:
+            self.logger.info("Checkpoint system enabled - will resume if previous run found")
 
         # Load the black-box model
         self.model, self.run_model_fn = self._load_blackbox_model()
@@ -288,18 +301,34 @@ class run:
         """
         Analyze all identified transitions for feature importance.
 
+        Supports resumption from checkpoints - skips already completed samples.
+
         Returns:
             Tuple of (results_dict, feature_names_list)
             - results_dict: Maps sample indices to [transition_name, importance_list]
             - feature_names_list: List of feature names (same for all analyses)
         """
-        importance_results = {}
-        feature_names = None
+        # Load existing results and determine remaining work
+        importance_results, feature_names, completed_samples = \
+            self.checkpoint_manager.load_checkpoint()
 
-        for transition_name in self.transitions_dict:
+        if completed_samples:
+            self.logger.info(f"Resuming from checkpoint: {len(completed_samples)} samples already completed")
+
+        # Determine remaining work
+        remaining_transitions = self.checkpoint_manager.get_remaining_work(self.transitions_dict)
+
+        if not remaining_transitions:
+            self.logger.info("All transitions already completed!")
+            return importance_results, feature_names
+
+        total_remaining = sum(len(samples) for samples in remaining_transitions.values())
+        total_completed = 0
+
+        for transition_name in remaining_transitions:
             self.logger.info(f"Starting transition >>> {transition_name}")
 
-            sample_indices = self.transitions_dict[transition_name]
+            sample_indices = remaining_transitions[transition_name]
             num_samples = len(sample_indices)
 
             for point_idx, sample_index in enumerate(sample_indices):
@@ -311,9 +340,19 @@ class run:
                     feature_names = feat_names
 
                 importance_results[sample_index] = [trans_name, importance]
+                completed_samples.add(sample_index)
+                total_completed += 1
+
+                # Save checkpoint after each sample
+                self.checkpoint_manager.save_checkpoint(
+                    importance_results,
+                    feature_names,
+                    completed_samples
+                )
 
                 self.logger.info(
-                    f"Completed {point_idx + 1}/{num_samples} results! "
+                    f"Completed {point_idx + 1}/{num_samples} for this transition "
+                    f"({total_completed}/{total_remaining} total remaining) | "
                     f"Stage 1 features kept >>> {n_selected}, "
                     f"Stage 2 features kept >>> {n_final}"
                 )
@@ -323,18 +362,29 @@ class run:
         return importance_results, feature_names
 
     def _save_results(self) -> None:
-        """Save feature names and results to disk."""
-        # Save feature names
-        feature_names_path = os.path.join(self.save_dir, 'MDTerp_feature_names.npy')
-        np.save(feature_names_path, self.feature_names)
+        """
+        Finalize and verify saved results.
 
-        # Save all results
+        Results are already incrementally saved via checkpoints, so this
+        method primarily serves to verify completeness and log final paths.
+        """
+        # Paths (already saved via checkpoints)
+        feature_names_path = os.path.join(self.save_dir, 'MDTerp_feature_names.npy')
         results_path = os.path.join(self.save_dir, 'MDTerp_results_all.pkl')
-        with open(results_path, 'wb') as f:
-            pickle.dump(self.results, f)
+
+        # Verify files exist
+        if not os.path.exists(feature_names_path):
+            self.logger.warning("Feature names file not found - saving now")
+            np.save(feature_names_path, self.feature_names)
+
+        if not os.path.exists(results_path):
+            self.logger.warning("Results file not found - saving now")
+            with open(results_path, 'wb') as f:
+                pickle.dump(self.results, f)
 
         self.logger.info(f"Feature names saved at >>> {feature_names_path}")
         self.logger.info(f"All results saved at >>> {results_path}")
+        self.logger.info(f"Checkpoint file at >>> {self.checkpoint_manager.checkpoint_file}")
 
     def _cleanup(self) -> None:
         """Clean up temporary directories and close logger."""
