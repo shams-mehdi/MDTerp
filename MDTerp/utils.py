@@ -1,8 +1,12 @@
 """
 MDTerp.utils.py – Auxiliary utility functions for MDTerp package.
+
+This module provides helper functions for logging, input validation,
+transition state detection, and result summarization.
 """
 import logging
 from logging import Logger
+from typing import Dict, List, Tuple
 import numpy as np
 from collections import defaultdict
 import pickle
@@ -60,28 +64,68 @@ def input_summary(logger: Logger, numeric_dict: dict, angle_dict: dict, sin_cos_
     
     logger.info(100*'-')
 
-def picker_fn(prob: np.ndarray, threshold: float, point_max: int) -> dict:
+def picker_fn(
+    state_probabilities: np.ndarray,
+    probability_threshold: float,
+    max_points_per_transition: int
+) -> Dict[str, np.ndarray]:
     """
-    Function for picking points at the transition state ensemble. Uses provided data and metastable state probability from the black-box model.
+    Identify and sample transition state points from model predictions.
+
+    A sample is considered to be in a transition state if its predicted
+    probabilities for two different metastable states both exceed the
+    threshold. This indicates uncertainty between states.
 
     Args:
-        prob (np.ndarray): Numpy 2D array containing metastable state prediction probabilities from the black-box model. Rows represent samples, and the number of columns represents the number of states. Each row should sum to 1.
-        threshold (float): Threshold for identifying if a sample belongs to a transition state predicted by the black-box model. If the metastable state probability > threshold for two different classes for a specific sample, it's suitable for analysis.
-        point_max (int): If too many suitable points exist for a specific transition (e.g., transition between metastable state 3 and 8), point_max sets the maximum number of points chosen for analysis. Points are chosen from a uniform distribution.
-        
+        state_probabilities: Array of shape (n_samples, n_states) containing
+            predicted probabilities for each state. Each row should sum to 1.
+        probability_threshold: Minimum probability for a state to be considered.
+            A sample is in a transition if its top 2 probabilities both exceed
+            this threshold. Typical values: 0.40-0.49.
+        max_points_per_transition: Maximum number of samples to select per
+            unique transition. If more samples exist, they are uniformly sampled
+            without replacement.
+
     Returns:
-        dict: Dictionary with keys representing detected transitions. E.g., key '3_8' means transition between index 3 and index 8 according to the prob array. Values represent chosen samples/rows in the provided dataset undergoing this transition.
+        Dictionary mapping transition names to sample indices. Keys are strings
+        like "0_1" (transition between states 0 and 1). Values are numpy arrays
+        of sample indices undergoing that transition.
+
+    Example:
+        >>> probs = np.array([[0.8, 0.2], [0.45, 0.45], [0.3, 0.7]])
+        >>> picker_fn(probs, 0.40, 10)
+        {'0_1': array([1])}  # Only middle sample is transitioning
     """
-    transition_dict = defaultdict(list)
-    for i in range(prob.shape[0]):
-        sorted_ind = np.sort(np.argsort(prob[i, :])[::-1][:2])
-        sorted_val = np.sort(prob[i, :])[::-1][:2]
-        if (sorted_val[0]>=threshold) and (sorted_val[1]>=threshold):
-            transition_dict[str(sorted_ind[0]) + '_' + str(sorted_ind[1])].append(i)
-    for i in transition_dict.keys():
-        transition_dict[i] = np.random.choice(transition_dict[i], size = min(point_max, len(transition_dict[i])), replace = False)
-    
-    return transition_dict
+    transitions_dict = defaultdict(list)
+
+    # Scan all samples for transition states
+    for sample_idx in range(state_probabilities.shape[0]):
+        # Get the top 2 states and their probabilities
+        top_2_state_indices = np.argsort(state_probabilities[sample_idx, :])[::-1][:2]
+        top_2_probabilities = np.sort(state_probabilities[sample_idx, :])[::-1][:2]
+
+        # Check if both top probabilities exceed threshold (transition state)
+        if (top_2_probabilities[0] >= probability_threshold and
+            top_2_probabilities[1] >= probability_threshold):
+
+            # Create transition key (ensure consistent ordering)
+            sorted_states = np.sort(top_2_state_indices)
+            transition_key = f"{sorted_states[0]}_{sorted_states[1]}"
+
+            transitions_dict[transition_key].append(sample_idx)
+
+    # Sample max_points_per_transition from each transition
+    for transition_key in transitions_dict.keys():
+        available_samples = transitions_dict[transition_key]
+        n_samples_to_select = min(max_points_per_transition, len(available_samples))
+
+        transitions_dict[transition_key] = np.random.choice(
+            available_samples,
+            size=n_samples_to_select,
+            replace=False
+        )
+
+    return dict(transitions_dict)
 
 def transition_summary(all_result_loc: str, importance_coverage: float = 0.8) -> dict:
     """
@@ -152,14 +196,42 @@ def dominant_feature(all_result_loc: str, n: int = 0) -> dict:
 
     return loaded_dict
 
-def make_result(given_indices, indices_names, importance):
-    tmp = []
-    for i in range(given_indices[0].shape[0]):
-        tmp.append(importance[given_indices[0][i]])
-        
-    for i in range(given_indices[1].shape[0]):
-        tmp.append(importance[given_indices[1][i]])
+def make_result(
+    feature_type_indices: List[np.ndarray],
+    feature_names: List[str],
+    raw_importance: np.ndarray
+) -> List[float]:
+    """
+    Convert raw feature importance to human-readable format.
 
-    for i in range(given_indices[2].shape[0]):
-        tmp.append((importance[given_indices[2][i]] + importance[given_indices[3][i]]))
-    return tmp
+    Combines sin/cos feature importances for angular features and
+    organizes results by feature type (numeric, angle, sin_cos).
+
+    Args:
+        feature_type_indices: List of 4 arrays [numeric_idx, angle_idx, sin_idx, cos_idx]
+            containing column indices for each feature type.
+        feature_names: List of feature names in output order.
+        raw_importance: Array of raw importance values from final_model.
+
+    Returns:
+        List of importance values ordered by feature_names. For sin/cos
+        features, importances are summed.
+    """
+    numeric_indices, angle_indices, sin_indices, cos_indices = feature_type_indices
+
+    importance_list = []
+
+    # Add numeric feature importances
+    for idx in numeric_indices:
+        importance_list.append(raw_importance[idx])
+
+    # Add angle feature importances
+    for idx in angle_indices:
+        importance_list.append(raw_importance[idx])
+
+    # Add sin_cos feature importances (sum sin and cos components)
+    for sin_idx, cos_idx in zip(sin_indices, cos_indices):
+        combined_importance = raw_importance[sin_idx] + raw_importance[cos_idx]
+        importance_list.append(combined_importance)
+
+    return importance_list

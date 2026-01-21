@@ -7,14 +7,24 @@
 
 **A python project for interpreting molecular dynamics trajectory metastable state classifications from machine-learning models**
 
+MDTerp uses thermodynamics-inspired explanations to provide feature importance for black-box AI models trained on molecular dynamics data. Based on the methodology from:
+
+> **"Thermodynamics-inspired explanations of artificial intelligence"**
+> Shams Mehdi and Pratyush Tiwary
+> *Nature Communications* (2023)
 
 -   Free software: MIT License
 -   Documentation: https://shams-mehdi.github.io/MDTerp
-    
+
 
 ## Features
 
--   (Test) Scans blackbox AI classifier models trained on MD data for feature importance.
+-   Scans blackbox AI classifier models trained on MD data for feature importance
+-   Multi-CPU parallel processing for faster analysis
+-   Automatic checkpointing and resume functionality for long-running analyses
+-   Adaptive hyperparameter tuning (prob_threshold auto-tuning)
+-   Comprehensive visualization utilities for analyzing results
+-   Statistical analysis tools for comparing transitions and extracting insights
   
 ## Installation
 
