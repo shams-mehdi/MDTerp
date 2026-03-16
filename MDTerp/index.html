@@ -15,7 +15,7 @@
         <link rel="canonical" href="https://shams-mehdi.github.io/MDTerp/MDTerp/">
       
       
-        <link rel="prev" href="../changelog/">
+        <link rel="prev" href="../visualization/">
       
       
         <link rel="next" href="../utils/">
@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.5">
     
     
       
@@ -567,6 +567,33 @@
       
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../visualization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Visualization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
     
   
   
@@ -580,10 +607,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" checked>
         
           
-          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="0">
             
   
   
@@ -601,8 +628,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_9">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_10">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -907,94 +934,289 @@
 <a id="MDTerp.base.run"></a>
     <div class="doc doc-contents first">
 
-      <p>MDTerp.base.run - Main class for implementing MDTERP.</p>
+      <p>Main class for implementing MDTerp analysis.</p>
+<p>MDTerp interprets black-box AI classifiers trained on molecular dynamics
+data by identifying transition-state samples and computing local feature
+importance using the TERP framework (Thermodynamics-inspired Explanations
+using Ridge regression with Perturbation).</p>
 
+<p><strong>Attributes:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>results</code></td>
+        <td></td>
+        <td><p>Dictionary mapping sample indices to [transition, importance].</p></td>
+      </tr>
+      <tr>
+        <td><code>feature_names</code></td>
+        <td></td>
+        <td><p>Array of feature name strings.</p></td>
+      </tr>
+      <tr>
+        <td><code>points</code></td>
+        <td></td>
+        <td><p>Dictionary of selected transition-state points.</p></td>
+      </tr>
+      <tr>
+        <td><code>thresholds</code></td>
+        <td></td>
+        <td><p>Dictionary of effective per-transition probability thresholds.</p></td>
+      </tr>
+      <tr>
+        <td><code>config</code></td>
+        <td></td>
+        <td><p>Dictionary of all run parameters.</p></td>
+      </tr>
+  </tbody>
+</table>
         <details class="quote">
           <summary>Source code in <code>MDTerp/base.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">run</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    MDTerp.base.run - Main class for implementing MDTERP.</span>
+<span class="sd">    Main class for implementing MDTerp analysis.</span>
+
+<span class="sd">    MDTerp interprets black-box AI classifiers trained on molecular dynamics</span>
+<span class="sd">    data by identifying transition-state samples and computing local feature</span>
+<span class="sd">    importance using the TERP framework (Thermodynamics-inspired Explanations</span>
+<span class="sd">    using Ridge regression with Perturbation).</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        results: Dictionary mapping sample indices to [transition, importance].</span>
+<span class="sd">        feature_names: Array of feature name strings.</span>
+<span class="sd">        points: Dictionary of selected transition-state points.</span>
+<span class="sd">        thresholds: Dictionary of effective per-transition probability thresholds.</span>
+<span class="sd">        config: Dictionary of all run parameters.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">np_data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">model_function_loc</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">numeric_dict</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{},</span> <span class="n">angle_dict</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{},</span> <span class="n">sin_cos_dict</span><span class="p">:</span><span class="nb">dict</span> <span class="o">=</span> <span class="p">{},</span> <span class="n">save_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;./results/&#39;</span><span class="p">,</span> <span class="n">prob_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.48</span><span class="p">,</span> <span class="n">point_max</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10000</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">15</span><span class="p">,</span> <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">unfaithfulness_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">,</span> <span class="n">periodicity_upper</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">periodicity_lower</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">np_data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">model_function_loc</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">numeric_dict</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">angle_dict</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">sin_cos_dict</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">save_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;./results/&#39;</span><span class="p">,</span>
+        <span class="n">point_max</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span>
+        <span class="n">prob_threshold_min</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.475</span><span class="p">,</span>
+        <span class="n">num_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10000</span><span class="p">,</span>
+        <span class="n">cutoff</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">15</span><span class="p">,</span>
+        <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">unfaithfulness_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">,</span>
+        <span class="n">periodicity_upper</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span>
+        <span class="n">periodicity_lower</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">save_all</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">n_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">keep_checkpoints</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Constructor for the MDTerp.base.run class.</span>
+<span class="sd">        Configure and execute the MDTerp analysis pipeline.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            np_data (np.ndarray): Black-box training data.</span>
-<span class="sd">            model_function_loc (str): Location of a human-readable file containing two functions called &#39;load_model()&#39;, and &#39;run_model()&#39;. &#39;load_model&#39; must not take any arguments and should return the black-box model. &#39;run_model&#39; must be a function that takes two arguments: the model and data, and returns metastable state probabilities. Go to https://shams-mehdi.github.io/MDTerp/docs/examples/ for example files.</span>
-<span class="sd">            numeric_dict (dict): Python dictionary, each key represents the name of a numeric feature (non-periodic). Values should be lists with a single element with the index of the corresponding numpy array in np_data.</span>
-<span class="sd">            angle_dict (dict): Python dictionary, each key represents the name of an angular feature in [-pi, pi]. Values should be lists with a single element with the index of the corresponding numpy array in np_data.</span>
-<span class="sd">            sin_cos_dict (dict): Python dictionary, each key represents the name of an angular feature. Values should be lists with two elements using the sine, cosine indices of the corresponding numpy array in np_data.</span>
-<span class="sd">            save_dir (str): Location to save MDTerp results.</span>
-<span class="sd">            prob_threshold (float): Threshold for identifying if a sample belongs to a transition state predicted by the black-box model. If metastable state probability &gt; threshold for two different classes for a specific sample, it&#39;s suitable for analysis (Default: 0.48).</span>
-<span class="sd">            point_max (int): If too many suitable samples exist for a specific transition (e.g., transition between metastable state 3 and 8), point_max sets the maximum number of points chosen for further analysis. Points are chosen from a uniform distribution (Default: 50).</span>
-<span class="sd">            num_samples (int): Size of the perturbed neighborhood (Default: 10000). Ad hoc rule: should be proportional to the square root of the number of features.</span>
-<span class="sd">            cutoff (int): Maximum number of features kept for the final round of MDTerp and forward feature selection (use to improve compute time: when too many features are in the dataset and a priori it is known it is unlikely that more features than set by cutoff will be relevant).</span>
-<span class="sd">            seed (int): Random seed.</span>
-<span class="sd">            unf_threshold (float): Hyperparameter that sets a lower limit on surrogate model unfaithafulness (U). Forward feature selection ends when unfaithfulness reaches lower than this threshold.</span>
-<span class="sd">            periodicity_upper (float): Sets periodicity of the angular features (Default: numpy.pi).</span>
-<span class="sd">            periodicity_lower (float): Sets periodicity of the angular features (Default: -numpy.py).</span>
-<span class="sd">            alpha (float): L2 norm of Ridge regression (Default: 1.0).</span>
-<span class="sd">        Returns:</span>
-<span class="sd">            None</span>
+<span class="sd">            np_data: 2D training data array (samples x features).</span>
+<span class="sd">            model_function_loc: Path to file defining load_model() and</span>
+<span class="sd">                run_model() functions for the black-box classifier.</span>
+<span class="sd">            numeric_dict: Feature name -&gt; [column_index] for numeric features.</span>
+<span class="sd">            angle_dict: Feature name -&gt; [column_index] for angular features.</span>
+<span class="sd">            sin_cos_dict: Feature name -&gt; [sin_index, cos_index] for sin/cos pairs.</span>
+<span class="sd">            save_dir: Directory to save all results (default: &#39;./results/&#39;).</span>
+<span class="sd">            point_max: Target number of points per transition (default: 50).</span>
+<span class="sd">            prob_threshold_min: Minimum probability threshold for transition</span>
+<span class="sd">                detection (default: 0.475). Applied as a floor per transition.</span>
+<span class="sd">            num_samples: Number of perturbed neighborhood samples (default: 10000).</span>
+<span class="sd">            cutoff: Maximum features kept after initial round (default: 15).</span>
+<span class="sd">            seed: Random seed (default: 0).</span>
+<span class="sd">            unfaithfulness_threshold: Stopping criterion for forward feature</span>
+<span class="sd">                selection (default: 0.01).</span>
+<span class="sd">            periodicity_upper: Upper bound for angular periodicity (default: pi).</span>
+<span class="sd">            periodicity_lower: Lower bound for angular periodicity (default: -pi).</span>
+<span class="sd">            alpha: Ridge regression L2 penalty (default: 1.0).</span>
+<span class="sd">            save_all: Keep intermediate DATA directories (default: False).</span>
+<span class="sd">            n_workers: Number of parallel worker processes. Defaults to the</span>
+<span class="sd">                number of available CPUs.</span>
+<span class="sd">            keep_checkpoints: Keep per-point result files after aggregation</span>
+<span class="sd">                (default: True).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># Initialization</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">save_dir</span><span class="p">,</span> <span class="n">exist_ok</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">numeric_dict</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">numeric_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">angle_dict</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">angle_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">sin_cos_dict</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">sin_cos_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">n_workers</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">n_workers</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()</span> <span class="ow">or</span> <span class="mi">1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;model_function_loc&#39;</span><span class="p">:</span> <span class="n">model_function_loc</span><span class="p">,</span>
+            <span class="s1">&#39;save_dir&#39;</span><span class="p">:</span> <span class="n">save_dir</span><span class="p">,</span>
+            <span class="s1">&#39;point_max&#39;</span><span class="p">:</span> <span class="n">point_max</span><span class="p">,</span>
+            <span class="s1">&#39;prob_threshold_min&#39;</span><span class="p">:</span> <span class="n">prob_threshold_min</span><span class="p">,</span>
+            <span class="s1">&#39;num_samples&#39;</span><span class="p">:</span> <span class="n">num_samples</span><span class="p">,</span>
+            <span class="s1">&#39;cutoff&#39;</span><span class="p">:</span> <span class="n">cutoff</span><span class="p">,</span>
+            <span class="s1">&#39;seed&#39;</span><span class="p">:</span> <span class="n">seed</span><span class="p">,</span>
+            <span class="s1">&#39;unfaithfulness_threshold&#39;</span><span class="p">:</span> <span class="n">unfaithfulness_threshold</span><span class="p">,</span>
+            <span class="s1">&#39;periodicity_upper&#39;</span><span class="p">:</span> <span class="n">periodicity_upper</span><span class="p">,</span>
+            <span class="s1">&#39;periodicity_lower&#39;</span><span class="p">:</span> <span class="n">periodicity_lower</span><span class="p">,</span>
+            <span class="s1">&#39;alpha&#39;</span><span class="p">:</span> <span class="n">alpha</span><span class="p">,</span>
+            <span class="s1">&#39;save_all&#39;</span><span class="p">:</span> <span class="n">save_all</span><span class="p">,</span>
+            <span class="s1">&#39;n_workers&#39;</span><span class="p">:</span> <span class="n">n_workers</span><span class="p">,</span>
+            <span class="s1">&#39;keep_checkpoints&#39;</span><span class="p">:</span> <span class="n">keep_checkpoints</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feature_names</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">points</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">thresholds</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_execute</span><span class="p">(</span>
+            <span class="n">np_data</span><span class="p">,</span> <span class="n">model_function_loc</span><span class="p">,</span> <span class="n">numeric_dict</span><span class="p">,</span> <span class="n">angle_dict</span><span class="p">,</span>
+            <span class="n">sin_cos_dict</span><span class="p">,</span> <span class="n">save_dir</span><span class="p">,</span> <span class="n">point_max</span><span class="p">,</span> <span class="n">prob_threshold_min</span><span class="p">,</span>
+            <span class="n">num_samples</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">unfaithfulness_threshold</span><span class="p">,</span>
+            <span class="n">periodicity_upper</span><span class="p">,</span> <span class="n">periodicity_lower</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">save_all</span><span class="p">,</span>
+            <span class="n">n_workers</span><span class="p">,</span> <span class="n">keep_checkpoints</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_execute</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">np_data</span><span class="p">,</span> <span class="n">model_function_loc</span><span class="p">,</span> <span class="n">numeric_dict</span><span class="p">,</span> <span class="n">angle_dict</span><span class="p">,</span>
+        <span class="n">sin_cos_dict</span><span class="p">,</span> <span class="n">save_dir</span><span class="p">,</span> <span class="n">point_max</span><span class="p">,</span> <span class="n">prob_threshold_min</span><span class="p">,</span>
+        <span class="n">num_samples</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">unfaithfulness_threshold</span><span class="p">,</span>
+        <span class="n">periodicity_upper</span><span class="p">,</span> <span class="n">periodicity_lower</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">save_all</span><span class="p">,</span>
+        <span class="n">n_workers</span><span class="p">,</span> <span class="n">keep_checkpoints</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Internal pipeline execution.&quot;&quot;&quot;</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">save_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">logger</span> <span class="o">=</span> <span class="n">log_maker</span><span class="p">(</span><span class="n">save_dir</span><span class="p">)</span>
         <span class="n">input_summary</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">numeric_dict</span><span class="p">,</span> <span class="n">angle_dict</span><span class="p">,</span> <span class="n">sin_cos_dict</span><span class="p">,</span> <span class="n">save_dir</span><span class="p">,</span> <span class="n">np_data</span><span class="p">)</span>
 
-        <span class="c1"># Load black-box model</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Loading blackbox model from file &gt;&gt;&gt; &#39;</span> <span class="o">+</span> <span class="n">model_function_loc</span><span class="p">)</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">model_function_loc</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
-            <span class="n">func_code</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="c1"># Load model for transition detection</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Loading black-box model from file &gt;&gt;&gt; &#39;</span> <span class="o">+</span> <span class="n">model_function_loc</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">model_function_loc</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">func_code</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
         <span class="n">local_ns</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">exec</span><span class="p">(</span><span class="n">func_code</span><span class="p">,</span> <span class="nb">globals</span><span class="p">(),</span> <span class="n">local_ns</span><span class="p">)</span>
         <span class="n">model</span> <span class="o">=</span> <span class="n">local_ns</span><span class="p">[</span><span class="s2">&quot;load_model&quot;</span><span class="p">]()</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Model loaded!&quot;</span><span class="p">)</span>
 
-        <span class="c1"># Identify transition states for given/training dataset</span>
+        <span class="c1"># Detect transition states with adaptive thresholds</span>
         <span class="n">state_probabilities</span> <span class="o">=</span> <span class="n">local_ns</span><span class="p">[</span><span class="s2">&quot;run_model&quot;</span><span class="p">](</span><span class="n">model</span><span class="p">,</span> <span class="n">np_data</span><span class="p">)</span>
-        <span class="n">points</span> <span class="o">=</span> <span class="n">picker_fn</span><span class="p">(</span><span class="n">state_probabilities</span><span class="p">,</span> <span class="n">prob_threshold</span><span class="p">,</span> <span class="n">point_max</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Number of state transitions detected &gt;&gt;&gt; &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">points</span><span class="o">.</span><span class="n">keys</span><span class="p">()))))</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Probability threshold, maximum number of points per transition &gt;&gt;&gt; &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">prob_threshold</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">point_max</span><span class="p">)</span> <span class="p">)</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">points</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;No transition detected. Check hyperparamters!&quot;</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+        <span class="n">points</span><span class="p">,</span> <span class="n">thresholds</span> <span class="o">=</span> <span class="n">select_transition_points</span><span class="p">(</span>
+            <span class="n">state_probabilities</span><span class="p">,</span> <span class="n">point_max</span><span class="p">,</span> <span class="n">prob_threshold_min</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">points</span> <span class="o">=</span> <span class="n">points</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">thresholds</span> <span class="o">=</span> <span class="n">thresholds</span>
+
+        <span class="n">n_transitions</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number of state transitions detected &gt;&gt;&gt; </span><span class="si">{</span><span class="n">n_transitions</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">trans</span><span class="p">,</span> <span class="n">thresh</span> <span class="ow">in</span> <span class="n">thresholds</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">n_pts</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">points</span><span class="p">[</span><span class="n">trans</span><span class="p">])</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;  Transition </span><span class="si">{</span><span class="n">trans</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">n_pts</span><span class="si">}</span><span class="s2"> points, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;effective threshold = </span><span class="si">{</span><span class="n">thresh</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">n_transitions</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;No transition detected. Check hyperparameters!&quot;</span><span class="p">)</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No transition detected. Check hyperparameters!&quot;</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="mi">100</span><span class="o">*</span><span class="s1">&#39;-&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="mi">100</span> <span class="o">*</span> <span class="s1">&#39;-&#39;</span><span class="p">)</span>
 
-        <span class="c1"># Loop over all the transitions</span>
-        <span class="n">importance_master</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c1"># Save run config for resume validation</span>
+        <span class="n">save_run_config</span><span class="p">(</span><span class="n">save_dir</span><span class="p">,</span> <span class="p">{</span>
+            <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span>
+            <span class="s1">&#39;points&#39;</span><span class="p">:</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">points</span><span class="o">.</span><span class="n">items</span><span class="p">()},</span>
+        <span class="p">})</span>
+
+        <span class="c1"># Check for previously completed points (crash recovery)</span>
+        <span class="n">completed</span> <span class="o">=</span> <span class="n">scan_completed_points</span><span class="p">(</span><span class="n">save_dir</span><span class="p">)</span>
+        <span class="n">total_points</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">points</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">completed</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Resuming: found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">completed</span><span class="p">)</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">total_points</span><span class="si">}</span><span class="s2"> completed &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;results, </span><span class="si">{</span><span class="n">total_points</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nb">len</span><span class="p">(</span><span class="n">completed</span><span class="p">)</span><span class="si">}</span><span class="s2"> remaining&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Build work queue, skipping completed points</span>
+        <span class="n">work_items</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">transition</span> <span class="ow">in</span> <span class="n">points</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Starting transition &gt;&gt;&gt; &quot;</span> <span class="o">+</span> <span class="n">transition</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">points</span><span class="p">[</span><span class="n">transition</span><span class="p">])):</span>
-                <span class="n">index</span> <span class="o">=</span> <span class="n">points</span><span class="p">[</span><span class="n">transition</span><span class="p">][</span><span class="n">point</span><span class="p">]</span>
-                <span class="n">feature_type_indices</span><span class="p">,</span> <span class="n">indices_names</span> <span class="o">=</span> <span class="n">generate_neighborhood</span><span class="p">(</span><span class="n">save_dir</span><span class="p">,</span> <span class="n">numeric_dict</span><span class="p">,</span> <span class="n">angle_dict</span><span class="p">,</span> <span class="n">sin_cos_dict</span><span class="p">,</span> <span class="n">np_data</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([]),</span> <span class="n">periodicity_upper</span><span class="p">,</span> <span class="n">periodicity_lower</span><span class="p">)</span>
-                <span class="n">state_probabilities2</span> <span class="o">=</span> <span class="n">local_ns</span><span class="p">[</span><span class="s2">&quot;run_model&quot;</span><span class="p">](</span><span class="n">model</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">save_dir</span> <span class="o">+</span> <span class="s1">&#39;DATA/make_prediction.npy&#39;</span><span class="p">))</span>
-                <span class="n">TERP_dat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">save_dir</span> <span class="o">+</span> <span class="s1">&#39;DATA/TERP_dat.npy&#39;</span><span class="p">)</span>
-                <span class="n">selected_features</span> <span class="o">=</span> <span class="n">init_model</span><span class="p">(</span><span class="n">TERP_dat</span><span class="p">,</span> <span class="n">state_probabilities2</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span> <span class="n">feature_type_indices</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">alpha</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">point_index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">points</span><span class="p">[</span><span class="n">transition</span><span class="p">])):</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">transition</span><span class="p">,</span> <span class="n">point_index</span><span class="p">)</span> <span class="ow">in</span> <span class="n">completed</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">work_items</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                    <span class="s1">&#39;save_dir&#39;</span><span class="p">:</span> <span class="n">save_dir</span><span class="p">,</span>
+                    <span class="s1">&#39;transition&#39;</span><span class="p">:</span> <span class="n">transition</span><span class="p">,</span>
+                    <span class="s1">&#39;point_index&#39;</span><span class="p">:</span> <span class="n">point_index</span><span class="p">,</span>
+                    <span class="s1">&#39;sample_index&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">points</span><span class="p">[</span><span class="n">transition</span><span class="p">][</span><span class="n">point_index</span><span class="p">]),</span>
+                    <span class="s1">&#39;training_data&#39;</span><span class="p">:</span> <span class="n">np_data</span><span class="p">,</span>
+                    <span class="s1">&#39;numeric_dict&#39;</span><span class="p">:</span> <span class="n">numeric_dict</span><span class="p">,</span>
+                    <span class="s1">&#39;angle_dict&#39;</span><span class="p">:</span> <span class="n">angle_dict</span><span class="p">,</span>
+                    <span class="s1">&#39;sin_cos_dict&#39;</span><span class="p">:</span> <span class="n">sin_cos_dict</span><span class="p">,</span>
+                    <span class="s1">&#39;seed&#39;</span><span class="p">:</span> <span class="n">seed</span><span class="p">,</span>
+                    <span class="s1">&#39;num_samples&#39;</span><span class="p">:</span> <span class="n">num_samples</span><span class="p">,</span>
+                    <span class="s1">&#39;cutoff&#39;</span><span class="p">:</span> <span class="n">cutoff</span><span class="p">,</span>
+                    <span class="s1">&#39;unfaithfulness_threshold&#39;</span><span class="p">:</span> <span class="n">unfaithfulness_threshold</span><span class="p">,</span>
+                    <span class="s1">&#39;periodicity_upper&#39;</span><span class="p">:</span> <span class="n">periodicity_upper</span><span class="p">,</span>
+                    <span class="s1">&#39;periodicity_lower&#39;</span><span class="p">:</span> <span class="n">periodicity_lower</span><span class="p">,</span>
+                    <span class="s1">&#39;alpha&#39;</span><span class="p">:</span> <span class="n">alpha</span><span class="p">,</span>
+                    <span class="s1">&#39;save_all&#39;</span><span class="p">:</span> <span class="n">save_all</span><span class="p">,</span>
+                <span class="p">})</span>
 
-                <span class="n">generate_neighborhood</span><span class="p">(</span><span class="n">save_dir</span><span class="p">,</span> <span class="n">numeric_dict</span><span class="p">,</span> <span class="n">angle_dict</span><span class="p">,</span> <span class="n">sin_cos_dict</span><span class="p">,</span> <span class="n">np_data</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">,</span> <span class="n">selected_features</span><span class="p">,</span> <span class="n">periodicity_upper</span><span class="p">,</span> <span class="n">periodicity_lower</span><span class="p">)</span>
-                <span class="n">state_probabilities3</span> <span class="o">=</span> <span class="n">local_ns</span><span class="p">[</span><span class="s2">&quot;run_model&quot;</span><span class="p">](</span><span class="n">model</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">save_dir</span> <span class="o">+</span> <span class="s1">&#39;DATA_2/make_prediction.npy&#39;</span><span class="p">))</span>
-                <span class="n">TERP_dat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">save_dir</span> <span class="o">+</span> <span class="s1">&#39;DATA_2/TERP_dat.npy&#39;</span><span class="p">)</span>
-                <span class="n">importance_0</span> <span class="o">=</span> <span class="n">final_model</span><span class="p">(</span><span class="n">TERP_dat</span><span class="p">,</span> <span class="n">state_probabilities3</span><span class="p">,</span> <span class="n">unfaithfulness_threshold</span><span class="p">,</span> <span class="n">feature_type_indices</span><span class="p">,</span> <span class="n">selected_features</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span>
-                <span class="n">importance</span> <span class="o">=</span> <span class="n">make_result</span><span class="p">(</span><span class="n">feature_type_indices</span><span class="p">,</span> <span class="n">indices_names</span><span class="p">,</span> <span class="n">importance_0</span><span class="p">)</span>
-                <span class="n">importance_master</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">transition</span><span class="p">,</span> <span class="n">importance</span><span class="p">]</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Completed generating &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">point</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">points</span><span class="p">[</span><span class="n">transition</span><span class="p">]))</span> <span class="o">+</span> <span class="s2">&quot; results!&quot;</span> <span class="o">+</span> <span class="s2">&quot; First round features kept &gt;&gt;&gt; &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">selected_features</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot;, Final round features kept &gt;&gt;&gt; &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">importance</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="mi">100</span><span class="o">*</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">work_items</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;All points already completed. Aggregating results.&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Analyzing </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">work_items</span><span class="p">)</span><span class="si">}</span><span class="s2"> points using </span><span class="si">{</span><span class="n">n_workers</span><span class="si">}</span><span class="s2"> workers...&quot;</span>
+            <span class="p">)</span>
 
-        <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">save_dir</span> <span class="o">+</span> <span class="s1">&#39;MDTerp_feature_names.npy&#39;</span><span class="p">,</span> <span class="n">indices_names</span><span class="p">)</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">save_dir</span> <span class="o">+</span> <span class="s1">&#39;MDTerp_results_all.pkl&#39;</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">importance_master</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+            <span class="c1"># Run analysis — model stays in main process (GPU-safe),</span>
+            <span class="c1"># CPU work is parallelized across workers</span>
+            <span class="n">run_model_fn</span> <span class="o">=</span> <span class="n">local_ns</span><span class="p">[</span><span class="s2">&quot;run_model&quot;</span><span class="p">]</span>
+            <span class="n">results</span> <span class="o">=</span> <span class="n">_run_parallel</span><span class="p">(</span><span class="n">work_items</span><span class="p">,</span> <span class="n">run_model_fn</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">n_workers</span><span class="p">)</span>
 
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Feature names saved at &gt;&gt;&gt; &quot;</span> <span class="o">+</span> <span class="n">save_dir</span> <span class="o">+</span> <span class="s1">&#39;MDTerp_feature_names.npy&#39;</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;All results saved at &gt;&gt;&gt; &quot;</span> <span class="o">+</span> <span class="n">save_dir</span> <span class="o">+</span> <span class="s1">&#39;MDTerp_results_all.pkl&#39;</span><span class="p">)</span>
+            <span class="c1"># Log results</span>
+            <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;completed&#39;</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Completed </span><span class="si">{</span><span class="n">r</span><span class="p">[</span><span class="s1">&#39;transition&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> point </span><span class="si">{</span><span class="n">r</span><span class="p">[</span><span class="s1">&#39;point_index&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">: &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;round 1 features = </span><span class="si">{</span><span class="n">r</span><span class="p">[</span><span class="s1">&#39;n_round1_features&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">, &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;final features = </span><span class="si">{</span><span class="n">r</span><span class="p">[</span><span class="s1">&#39;n_final_features&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Failed </span><span class="si">{</span><span class="n">r</span><span class="p">[</span><span class="s1">&#39;transition&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> point </span><span class="si">{</span><span class="n">r</span><span class="p">[</span><span class="s1">&#39;point_index&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">: &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">r</span><span class="p">[</span><span class="s1">&#39;error&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
 
+        <span class="c1"># Derive feature names from dictionaries</span>
+        <span class="n">feature_names</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="nb">list</span><span class="p">(</span><span class="n">numeric_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+            <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">angle_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+            <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">sin_cos_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="p">)</span>
 
-        <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">save_dir</span> <span class="o">+</span> <span class="s1">&#39;DATA&#39;</span><span class="p">)</span>
-        <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">save_dir</span> <span class="o">+</span> <span class="s1">&#39;DATA_2&#39;</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Completed!!!&quot;</span><span class="p">)</span>
+        <span class="c1"># Aggregate all per-point results</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feature_names</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">feature_names</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="n">aggregate_results</span><span class="p">(</span>
+            <span class="n">save_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_names</span><span class="p">,</span> <span class="n">keep_checkpoints</span><span class="p">,</span>
+        <span class="p">)</span>
 
-        <span class="c1"># Flush and close logger</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s2">&quot;Feature names saved at &gt;&gt;&gt; &quot;</span>
+            <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">save_dir</span><span class="p">,</span> <span class="s1">&#39;MDTerp_feature_names.npy&#39;</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s2">&quot;All results saved at &gt;&gt;&gt; &quot;</span>
+            <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">save_dir</span><span class="p">,</span> <span class="s1">&#39;MDTerp_results_all.pkl&#39;</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Completed!&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Clean up logger</span>
         <span class="k">for</span> <span class="n">handler</span> <span class="ow">in</span> <span class="n">logger</span><span class="o">.</span><span class="n">handlers</span><span class="p">[:]:</span>
             <span class="n">handler</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">removeHandler</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span>
@@ -1018,7 +1240,7 @@
 
 
 <h2 id="MDTerp.base.run.__init__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">np_data</span><span class="p">,</span> <span class="n">model_function_loc</span><span class="p">,</span> <span class="n">numeric_dict</span><span class="o">=</span><span class="p">{},</span> <span class="n">angle_dict</span><span class="o">=</span><span class="p">{},</span> <span class="n">sin_cos_dict</span><span class="o">=</span><span class="p">{},</span> <span class="n">save_dir</span><span class="o">=</span><span class="s1">&#39;./results/&#39;</span><span class="p">,</span> <span class="n">prob_threshold</span><span class="o">=</span><span class="mf">0.48</span><span class="p">,</span> <span class="n">point_max</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">unfaithfulness_threshold</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">periodicity_upper</span><span class="o">=</span><span class="mf">3.141592653589793</span><span class="p">,</span> <span class="n">periodicity_lower</span><span class="o">=-</span><span class="mf">3.141592653589793</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">np_data</span><span class="p">,</span> <span class="n">model_function_loc</span><span class="p">,</span> <span class="n">numeric_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">angle_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sin_cos_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">save_dir</span><span class="o">=</span><span class="s1">&#39;./results/&#39;</span><span class="p">,</span> <span class="n">point_max</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">prob_threshold_min</span><span class="o">=</span><span class="mf">0.475</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">unfaithfulness_threshold</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">periodicity_upper</span><span class="o">=</span><span class="mf">3.141592653589793</span><span class="p">,</span> <span class="n">periodicity_lower</span><span class="o">=-</span><span class="mf">3.141592653589793</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">save_all</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">n_workers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">keep_checkpoints</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
 
   <span class="doc doc-properties">
       <small class="doc doc-property doc-property-special"><code>special</code></small>
@@ -1028,7 +1250,7 @@
 
     <div class="doc doc-contents ">
 
-      <p>Constructor for the MDTerp.base.run class.</p>
+      <p>Configure and execute the MDTerp analysis pipeline.</p>
 
 <p><strong>Parameters:</strong></p>
 <table>
@@ -1043,196 +1265,208 @@
   <tbody>
       <tr>
         <td><code>np_data</code></td>
-        <td><code>np.ndarray</code></td>
-        <td><p>Black-box training data.</p></td>
+        <td><code>ndarray</code></td>
+        <td><p>2D training data array (samples x features).</p></td>
         <td><em>required</em></td>
       </tr>
       <tr>
         <td><code>model_function_loc</code></td>
         <td><code>str</code></td>
-        <td><p>Location of a human-readable file containing two functions called 'load_model()', and 'run_model()'. 'load_model' must not take any arguments and should return the black-box model. 'run_model' must be a function that takes two arguments: the model and data, and returns metastable state probabilities. Go to https://shams-mehdi.github.io/MDTerp/docs/examples/ for example files.</p></td>
+        <td><p>Path to file defining load_model() and
+run_model() functions for the black-box classifier.</p></td>
         <td><em>required</em></td>
       </tr>
       <tr>
         <td><code>numeric_dict</code></td>
         <td><code>dict</code></td>
-        <td><p>Python dictionary, each key represents the name of a numeric feature (non-periodic). Values should be lists with a single element with the index of the corresponding numpy array in np_data.</p></td>
-        <td><code>{}</code></td>
+        <td><p>Feature name -&gt; [column_index] for numeric features.</p></td>
+        <td><code>None</code></td>
       </tr>
       <tr>
         <td><code>angle_dict</code></td>
         <td><code>dict</code></td>
-        <td><p>Python dictionary, each key represents the name of an angular feature in [-pi, pi]. Values should be lists with a single element with the index of the corresponding numpy array in np_data.</p></td>
-        <td><code>{}</code></td>
+        <td><p>Feature name -&gt; [column_index] for angular features.</p></td>
+        <td><code>None</code></td>
       </tr>
       <tr>
         <td><code>sin_cos_dict</code></td>
         <td><code>dict</code></td>
-        <td><p>Python dictionary, each key represents the name of an angular feature. Values should be lists with two elements using the sine, cosine indices of the corresponding numpy array in np_data.</p></td>
-        <td><code>{}</code></td>
+        <td><p>Feature name -&gt; [sin_index, cos_index] for sin/cos pairs.</p></td>
+        <td><code>None</code></td>
       </tr>
       <tr>
         <td><code>save_dir</code></td>
         <td><code>str</code></td>
-        <td><p>Location to save MDTerp results.</p></td>
+        <td><p>Directory to save all results (default: './results/').</p></td>
         <td><code>&#39;./results/&#39;</code></td>
-      </tr>
-      <tr>
-        <td><code>prob_threshold</code></td>
-        <td><code>float</code></td>
-        <td><p>Threshold for identifying if a sample belongs to a transition state predicted by the black-box model. If metastable state probability &gt; threshold for two different classes for a specific sample, it's suitable for analysis (Default: 0.48).</p></td>
-        <td><code>0.48</code></td>
       </tr>
       <tr>
         <td><code>point_max</code></td>
         <td><code>int</code></td>
-        <td><p>If too many suitable samples exist for a specific transition (e.g., transition between metastable state 3 and 8), point_max sets the maximum number of points chosen for further analysis. Points are chosen from a uniform distribution (Default: 50).</p></td>
+        <td><p>Target number of points per transition (default: 50).</p></td>
         <td><code>50</code></td>
+      </tr>
+      <tr>
+        <td><code>prob_threshold_min</code></td>
+        <td><code>float</code></td>
+        <td><p>Minimum probability threshold for transition
+detection (default: 0.475). Applied as a floor per transition.</p></td>
+        <td><code>0.475</code></td>
       </tr>
       <tr>
         <td><code>num_samples</code></td>
         <td><code>int</code></td>
-        <td><p>Size of the perturbed neighborhood (Default: 10000). Ad hoc rule: should be proportional to the square root of the number of features.</p></td>
+        <td><p>Number of perturbed neighborhood samples (default: 10000).</p></td>
         <td><code>10000</code></td>
       </tr>
       <tr>
         <td><code>cutoff</code></td>
         <td><code>int</code></td>
-        <td><p>Maximum number of features kept for the final round of MDTerp and forward feature selection (use to improve compute time: when too many features are in the dataset and a priori it is known it is unlikely that more features than set by cutoff will be relevant).</p></td>
+        <td><p>Maximum features kept after initial round (default: 15).</p></td>
         <td><code>15</code></td>
       </tr>
       <tr>
         <td><code>seed</code></td>
         <td><code>int</code></td>
-        <td><p>Random seed.</p></td>
+        <td><p>Random seed (default: 0).</p></td>
         <td><code>0</code></td>
       </tr>
       <tr>
-        <td><code>unf_threshold</code></td>
+        <td><code>unfaithfulness_threshold</code></td>
         <td><code>float</code></td>
-        <td><p>Hyperparameter that sets a lower limit on surrogate model unfaithafulness (U). Forward feature selection ends when unfaithfulness reaches lower than this threshold.</p></td>
-        <td><em>required</em></td>
+        <td><p>Stopping criterion for forward feature
+selection (default: 0.01).</p></td>
+        <td><code>0.01</code></td>
       </tr>
       <tr>
         <td><code>periodicity_upper</code></td>
         <td><code>float</code></td>
-        <td><p>Sets periodicity of the angular features (Default: numpy.pi).</p></td>
+        <td><p>Upper bound for angular periodicity (default: pi).</p></td>
         <td><code>3.141592653589793</code></td>
       </tr>
       <tr>
         <td><code>periodicity_lower</code></td>
         <td><code>float</code></td>
-        <td><p>Sets periodicity of the angular features (Default: -numpy.py).</p></td>
+        <td><p>Lower bound for angular periodicity (default: -pi).</p></td>
         <td><code>-3.141592653589793</code></td>
       </tr>
       <tr>
         <td><code>alpha</code></td>
         <td><code>float</code></td>
-        <td><p>L2 norm of Ridge regression (Default: 1.0).</p></td>
+        <td><p>Ridge regression L2 penalty (default: 1.0).</p></td>
         <td><code>1.0</code></td>
       </tr>
-  </tbody>
-</table>
-<p><strong>Returns:</strong></p>
-<table>
-  <thead>
-    <tr>
-      <th>Type</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><code>None</code></td>
-      <td><p>None</p></td>
-    </tr>
+      <tr>
+        <td><code>save_all</code></td>
+        <td><code>bool</code></td>
+        <td><p>Keep intermediate DATA directories (default: False).</p></td>
+        <td><code>False</code></td>
+      </tr>
+      <tr>
+        <td><code>n_workers</code></td>
+        <td><code>int</code></td>
+        <td><p>Number of parallel worker processes. Defaults to the
+number of available CPUs.</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>keep_checkpoints</code></td>
+        <td><code>bool</code></td>
+        <td><p>Keep per-point result files after aggregation
+(default: True).</p></td>
+        <td><code>True</code></td>
+      </tr>
   </tbody>
 </table>
         <details class="quote">
           <summary>Source code in <code>MDTerp/base.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">np_data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">model_function_loc</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">numeric_dict</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{},</span> <span class="n">angle_dict</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{},</span> <span class="n">sin_cos_dict</span><span class="p">:</span><span class="nb">dict</span> <span class="o">=</span> <span class="p">{},</span> <span class="n">save_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;./results/&#39;</span><span class="p">,</span> <span class="n">prob_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.48</span><span class="p">,</span> <span class="n">point_max</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10000</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">15</span><span class="p">,</span> <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">unfaithfulness_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">,</span> <span class="n">periodicity_upper</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">periodicity_lower</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">np_data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">model_function_loc</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">numeric_dict</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">angle_dict</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">sin_cos_dict</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">save_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;./results/&#39;</span><span class="p">,</span>
+    <span class="n">point_max</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span>
+    <span class="n">prob_threshold_min</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.475</span><span class="p">,</span>
+    <span class="n">num_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10000</span><span class="p">,</span>
+    <span class="n">cutoff</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">15</span><span class="p">,</span>
+    <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">unfaithfulness_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">,</span>
+    <span class="n">periodicity_upper</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span>
+    <span class="n">periodicity_lower</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span>
+    <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">save_all</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">n_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">keep_checkpoints</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Constructor for the MDTerp.base.run class.</span>
+<span class="sd">    Configure and execute the MDTerp analysis pipeline.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        np_data (np.ndarray): Black-box training data.</span>
-<span class="sd">        model_function_loc (str): Location of a human-readable file containing two functions called &#39;load_model()&#39;, and &#39;run_model()&#39;. &#39;load_model&#39; must not take any arguments and should return the black-box model. &#39;run_model&#39; must be a function that takes two arguments: the model and data, and returns metastable state probabilities. Go to https://shams-mehdi.github.io/MDTerp/docs/examples/ for example files.</span>
-<span class="sd">        numeric_dict (dict): Python dictionary, each key represents the name of a numeric feature (non-periodic). Values should be lists with a single element with the index of the corresponding numpy array in np_data.</span>
-<span class="sd">        angle_dict (dict): Python dictionary, each key represents the name of an angular feature in [-pi, pi]. Values should be lists with a single element with the index of the corresponding numpy array in np_data.</span>
-<span class="sd">        sin_cos_dict (dict): Python dictionary, each key represents the name of an angular feature. Values should be lists with two elements using the sine, cosine indices of the corresponding numpy array in np_data.</span>
-<span class="sd">        save_dir (str): Location to save MDTerp results.</span>
-<span class="sd">        prob_threshold (float): Threshold for identifying if a sample belongs to a transition state predicted by the black-box model. If metastable state probability &gt; threshold for two different classes for a specific sample, it&#39;s suitable for analysis (Default: 0.48).</span>
-<span class="sd">        point_max (int): If too many suitable samples exist for a specific transition (e.g., transition between metastable state 3 and 8), point_max sets the maximum number of points chosen for further analysis. Points are chosen from a uniform distribution (Default: 50).</span>
-<span class="sd">        num_samples (int): Size of the perturbed neighborhood (Default: 10000). Ad hoc rule: should be proportional to the square root of the number of features.</span>
-<span class="sd">        cutoff (int): Maximum number of features kept for the final round of MDTerp and forward feature selection (use to improve compute time: when too many features are in the dataset and a priori it is known it is unlikely that more features than set by cutoff will be relevant).</span>
-<span class="sd">        seed (int): Random seed.</span>
-<span class="sd">        unf_threshold (float): Hyperparameter that sets a lower limit on surrogate model unfaithafulness (U). Forward feature selection ends when unfaithfulness reaches lower than this threshold.</span>
-<span class="sd">        periodicity_upper (float): Sets periodicity of the angular features (Default: numpy.pi).</span>
-<span class="sd">        periodicity_lower (float): Sets periodicity of the angular features (Default: -numpy.py).</span>
-<span class="sd">        alpha (float): L2 norm of Ridge regression (Default: 1.0).</span>
-<span class="sd">    Returns:</span>
-<span class="sd">        None</span>
+<span class="sd">        np_data: 2D training data array (samples x features).</span>
+<span class="sd">        model_function_loc: Path to file defining load_model() and</span>
+<span class="sd">            run_model() functions for the black-box classifier.</span>
+<span class="sd">        numeric_dict: Feature name -&gt; [column_index] for numeric features.</span>
+<span class="sd">        angle_dict: Feature name -&gt; [column_index] for angular features.</span>
+<span class="sd">        sin_cos_dict: Feature name -&gt; [sin_index, cos_index] for sin/cos pairs.</span>
+<span class="sd">        save_dir: Directory to save all results (default: &#39;./results/&#39;).</span>
+<span class="sd">        point_max: Target number of points per transition (default: 50).</span>
+<span class="sd">        prob_threshold_min: Minimum probability threshold for transition</span>
+<span class="sd">            detection (default: 0.475). Applied as a floor per transition.</span>
+<span class="sd">        num_samples: Number of perturbed neighborhood samples (default: 10000).</span>
+<span class="sd">        cutoff: Maximum features kept after initial round (default: 15).</span>
+<span class="sd">        seed: Random seed (default: 0).</span>
+<span class="sd">        unfaithfulness_threshold: Stopping criterion for forward feature</span>
+<span class="sd">            selection (default: 0.01).</span>
+<span class="sd">        periodicity_upper: Upper bound for angular periodicity (default: pi).</span>
+<span class="sd">        periodicity_lower: Lower bound for angular periodicity (default: -pi).</span>
+<span class="sd">        alpha: Ridge regression L2 penalty (default: 1.0).</span>
+<span class="sd">        save_all: Keep intermediate DATA directories (default: False).</span>
+<span class="sd">        n_workers: Number of parallel worker processes. Defaults to the</span>
+<span class="sd">            number of available CPUs.</span>
+<span class="sd">        keep_checkpoints: Keep per-point result files after aggregation</span>
+<span class="sd">            (default: True).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Initialization</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">save_dir</span><span class="p">,</span> <span class="n">exist_ok</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
-    <span class="n">logger</span> <span class="o">=</span> <span class="n">log_maker</span><span class="p">(</span><span class="n">save_dir</span><span class="p">)</span>
-    <span class="n">input_summary</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">numeric_dict</span><span class="p">,</span> <span class="n">angle_dict</span><span class="p">,</span> <span class="n">sin_cos_dict</span><span class="p">,</span> <span class="n">save_dir</span><span class="p">,</span> <span class="n">np_data</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">numeric_dict</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">numeric_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="n">angle_dict</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">angle_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="n">sin_cos_dict</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">sin_cos_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="n">n_workers</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">n_workers</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()</span> <span class="ow">or</span> <span class="mi">1</span>
 
-    <span class="c1"># Load black-box model</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Loading blackbox model from file &gt;&gt;&gt; &#39;</span> <span class="o">+</span> <span class="n">model_function_loc</span><span class="p">)</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">model_function_loc</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
-        <span class="n">func_code</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-    <span class="n">local_ns</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="n">exec</span><span class="p">(</span><span class="n">func_code</span><span class="p">,</span> <span class="nb">globals</span><span class="p">(),</span> <span class="n">local_ns</span><span class="p">)</span>
-    <span class="n">model</span> <span class="o">=</span> <span class="n">local_ns</span><span class="p">[</span><span class="s2">&quot;load_model&quot;</span><span class="p">]()</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Model loaded!&quot;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;model_function_loc&#39;</span><span class="p">:</span> <span class="n">model_function_loc</span><span class="p">,</span>
+        <span class="s1">&#39;save_dir&#39;</span><span class="p">:</span> <span class="n">save_dir</span><span class="p">,</span>
+        <span class="s1">&#39;point_max&#39;</span><span class="p">:</span> <span class="n">point_max</span><span class="p">,</span>
+        <span class="s1">&#39;prob_threshold_min&#39;</span><span class="p">:</span> <span class="n">prob_threshold_min</span><span class="p">,</span>
+        <span class="s1">&#39;num_samples&#39;</span><span class="p">:</span> <span class="n">num_samples</span><span class="p">,</span>
+        <span class="s1">&#39;cutoff&#39;</span><span class="p">:</span> <span class="n">cutoff</span><span class="p">,</span>
+        <span class="s1">&#39;seed&#39;</span><span class="p">:</span> <span class="n">seed</span><span class="p">,</span>
+        <span class="s1">&#39;unfaithfulness_threshold&#39;</span><span class="p">:</span> <span class="n">unfaithfulness_threshold</span><span class="p">,</span>
+        <span class="s1">&#39;periodicity_upper&#39;</span><span class="p">:</span> <span class="n">periodicity_upper</span><span class="p">,</span>
+        <span class="s1">&#39;periodicity_lower&#39;</span><span class="p">:</span> <span class="n">periodicity_lower</span><span class="p">,</span>
+        <span class="s1">&#39;alpha&#39;</span><span class="p">:</span> <span class="n">alpha</span><span class="p">,</span>
+        <span class="s1">&#39;save_all&#39;</span><span class="p">:</span> <span class="n">save_all</span><span class="p">,</span>
+        <span class="s1">&#39;n_workers&#39;</span><span class="p">:</span> <span class="n">n_workers</span><span class="p">,</span>
+        <span class="s1">&#39;keep_checkpoints&#39;</span><span class="p">:</span> <span class="n">keep_checkpoints</span><span class="p">,</span>
+    <span class="p">}</span>
 
-    <span class="c1"># Identify transition states for given/training dataset</span>
-    <span class="n">state_probabilities</span> <span class="o">=</span> <span class="n">local_ns</span><span class="p">[</span><span class="s2">&quot;run_model&quot;</span><span class="p">](</span><span class="n">model</span><span class="p">,</span> <span class="n">np_data</span><span class="p">)</span>
-    <span class="n">points</span> <span class="o">=</span> <span class="n">picker_fn</span><span class="p">(</span><span class="n">state_probabilities</span><span class="p">,</span> <span class="n">prob_threshold</span><span class="p">,</span> <span class="n">point_max</span><span class="p">)</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Number of state transitions detected &gt;&gt;&gt; &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">points</span><span class="o">.</span><span class="n">keys</span><span class="p">()))))</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Probability threshold, maximum number of points per transition &gt;&gt;&gt; &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">prob_threshold</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">point_max</span><span class="p">)</span> <span class="p">)</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">points</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;No transition detected. Check hyperparamters!&quot;</span><span class="p">)</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No transition detected. Check hyperparameters!&quot;</span><span class="p">)</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="mi">100</span><span class="o">*</span><span class="s1">&#39;-&#39;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">feature_names</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">points</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">thresholds</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="c1"># Loop over all the transitions</span>
-    <span class="n">importance_master</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="k">for</span> <span class="n">transition</span> <span class="ow">in</span> <span class="n">points</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Starting transition &gt;&gt;&gt; &quot;</span> <span class="o">+</span> <span class="n">transition</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">points</span><span class="p">[</span><span class="n">transition</span><span class="p">])):</span>
-            <span class="n">index</span> <span class="o">=</span> <span class="n">points</span><span class="p">[</span><span class="n">transition</span><span class="p">][</span><span class="n">point</span><span class="p">]</span>
-            <span class="n">feature_type_indices</span><span class="p">,</span> <span class="n">indices_names</span> <span class="o">=</span> <span class="n">generate_neighborhood</span><span class="p">(</span><span class="n">save_dir</span><span class="p">,</span> <span class="n">numeric_dict</span><span class="p">,</span> <span class="n">angle_dict</span><span class="p">,</span> <span class="n">sin_cos_dict</span><span class="p">,</span> <span class="n">np_data</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([]),</span> <span class="n">periodicity_upper</span><span class="p">,</span> <span class="n">periodicity_lower</span><span class="p">)</span>
-            <span class="n">state_probabilities2</span> <span class="o">=</span> <span class="n">local_ns</span><span class="p">[</span><span class="s2">&quot;run_model&quot;</span><span class="p">](</span><span class="n">model</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">save_dir</span> <span class="o">+</span> <span class="s1">&#39;DATA/make_prediction.npy&#39;</span><span class="p">))</span>
-            <span class="n">TERP_dat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">save_dir</span> <span class="o">+</span> <span class="s1">&#39;DATA/TERP_dat.npy&#39;</span><span class="p">)</span>
-            <span class="n">selected_features</span> <span class="o">=</span> <span class="n">init_model</span><span class="p">(</span><span class="n">TERP_dat</span><span class="p">,</span> <span class="n">state_probabilities2</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span> <span class="n">feature_type_indices</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">alpha</span><span class="p">)</span>
-
-            <span class="n">generate_neighborhood</span><span class="p">(</span><span class="n">save_dir</span><span class="p">,</span> <span class="n">numeric_dict</span><span class="p">,</span> <span class="n">angle_dict</span><span class="p">,</span> <span class="n">sin_cos_dict</span><span class="p">,</span> <span class="n">np_data</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">,</span> <span class="n">selected_features</span><span class="p">,</span> <span class="n">periodicity_upper</span><span class="p">,</span> <span class="n">periodicity_lower</span><span class="p">)</span>
-            <span class="n">state_probabilities3</span> <span class="o">=</span> <span class="n">local_ns</span><span class="p">[</span><span class="s2">&quot;run_model&quot;</span><span class="p">](</span><span class="n">model</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">save_dir</span> <span class="o">+</span> <span class="s1">&#39;DATA_2/make_prediction.npy&#39;</span><span class="p">))</span>
-            <span class="n">TERP_dat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">save_dir</span> <span class="o">+</span> <span class="s1">&#39;DATA_2/TERP_dat.npy&#39;</span><span class="p">)</span>
-            <span class="n">importance_0</span> <span class="o">=</span> <span class="n">final_model</span><span class="p">(</span><span class="n">TERP_dat</span><span class="p">,</span> <span class="n">state_probabilities3</span><span class="p">,</span> <span class="n">unfaithfulness_threshold</span><span class="p">,</span> <span class="n">feature_type_indices</span><span class="p">,</span> <span class="n">selected_features</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span>
-            <span class="n">importance</span> <span class="o">=</span> <span class="n">make_result</span><span class="p">(</span><span class="n">feature_type_indices</span><span class="p">,</span> <span class="n">indices_names</span><span class="p">,</span> <span class="n">importance_0</span><span class="p">)</span>
-            <span class="n">importance_master</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">transition</span><span class="p">,</span> <span class="n">importance</span><span class="p">]</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Completed generating &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">point</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">points</span><span class="p">[</span><span class="n">transition</span><span class="p">]))</span> <span class="o">+</span> <span class="s2">&quot; results!&quot;</span> <span class="o">+</span> <span class="s2">&quot; First round features kept &gt;&gt;&gt; &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">selected_features</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot;, Final round features kept &gt;&gt;&gt; &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">importance</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="mi">100</span><span class="o">*</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>
-
-    <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">save_dir</span> <span class="o">+</span> <span class="s1">&#39;MDTerp_feature_names.npy&#39;</span><span class="p">,</span> <span class="n">indices_names</span><span class="p">)</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">save_dir</span> <span class="o">+</span> <span class="s1">&#39;MDTerp_results_all.pkl&#39;</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">importance_master</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
-
-    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Feature names saved at &gt;&gt;&gt; &quot;</span> <span class="o">+</span> <span class="n">save_dir</span> <span class="o">+</span> <span class="s1">&#39;MDTerp_feature_names.npy&#39;</span><span class="p">)</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;All results saved at &gt;&gt;&gt; &quot;</span> <span class="o">+</span> <span class="n">save_dir</span> <span class="o">+</span> <span class="s1">&#39;MDTerp_results_all.pkl&#39;</span><span class="p">)</span>
-
-
-    <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">save_dir</span> <span class="o">+</span> <span class="s1">&#39;DATA&#39;</span><span class="p">)</span>
-    <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">save_dir</span> <span class="o">+</span> <span class="s1">&#39;DATA_2&#39;</span><span class="p">)</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Completed!!!&quot;</span><span class="p">)</span>
-
-    <span class="c1"># Flush and close logger</span>
-    <span class="k">for</span> <span class="n">handler</span> <span class="ow">in</span> <span class="n">logger</span><span class="o">.</span><span class="n">handlers</span><span class="p">[:]:</span>
-        <span class="n">handler</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">removeHandler</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_execute</span><span class="p">(</span>
+        <span class="n">np_data</span><span class="p">,</span> <span class="n">model_function_loc</span><span class="p">,</span> <span class="n">numeric_dict</span><span class="p">,</span> <span class="n">angle_dict</span><span class="p">,</span>
+        <span class="n">sin_cos_dict</span><span class="p">,</span> <span class="n">save_dir</span><span class="p">,</span> <span class="n">point_max</span><span class="p">,</span> <span class="n">prob_threshold_min</span><span class="p">,</span>
+        <span class="n">num_samples</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">unfaithfulness_threshold</span><span class="p">,</span>
+        <span class="n">periodicity_upper</span><span class="p">,</span> <span class="n">periodicity_lower</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">save_all</span><span class="p">,</span>
+        <span class="n">n_workers</span><span class="p">,</span> <span class="n">keep_checkpoints</span><span class="p">,</span>
+    <span class="p">)</span>
 </code></pre></div>
         </details>
     </div>
@@ -1316,7 +1550,7 @@
       <div class="md-copyright">
   
     <div class="md-copyright__highlight">
-      Copyright &copy; 2024 - 2024 shams mehdi
+      Copyright &copy; 2024 - 2026 shams mehdi
     </div>
   
   

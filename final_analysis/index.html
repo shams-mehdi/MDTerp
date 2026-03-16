@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.5">
     
     
       
@@ -565,6 +565,33 @@
       
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../visualization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Visualization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
     
   
   
@@ -578,10 +605,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" checked>
         
           
-          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="0">
             
   
   
@@ -599,8 +626,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_9">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_10">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -800,17 +827,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#MDTerp.final_analysis.SGDreg" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        SGDreg()
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#MDTerp.final_analysis.charac_theta" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -833,21 +849,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#MDTerp.final_analysis.interp" class="md-nav__link">
+  <a href="#MDTerp.final_analysis.interpretation_entropy" class="md-nav__link">
     <span class="md-ellipsis">
       
-        interp()
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#MDTerp.final_analysis.similarity_kernel" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        similarity_kernel()
+        interpretation_entropy()
       
     </span>
   </a>
@@ -930,17 +935,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#MDTerp.final_analysis.SGDreg" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        SGDreg()
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#MDTerp.final_analysis.charac_theta" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -963,21 +957,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#MDTerp.final_analysis.interp" class="md-nav__link">
+  <a href="#MDTerp.final_analysis.interpretation_entropy" class="md-nav__link">
     <span class="md-ellipsis">
       
-        interp()
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#MDTerp.final_analysis.similarity_kernel" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        similarity_kernel()
+        interpretation_entropy()
       
     </span>
   </a>
@@ -1047,102 +1030,6 @@
 
 
 
-
-
-
-  <div class="doc doc-object doc-function">
-
-
-
-<h2 id="MDTerp.final_analysis.SGDreg" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">SGDreg</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span></code>
-
-
-<a href="#MDTerp.final_analysis.SGDreg" class="headerlink" title="Permanent link">&para;</a></h2>
-
-    <div class="doc doc-contents ">
-
-      <p>Function for implementing linear regression using stochastic gradient descent.</p>
-
-<p><strong>Parameters:</strong></p>
-<table>
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Description</th>
-      <th>Default</th>
-    </tr>
-  </thead>
-  <tbody>
-      <tr>
-        <td><code>data</code></td>
-        <td><code>np.ndarray</code></td>
-        <td><p>Numpy 2D array containing the similarity-weighted training data for the black-box model. Samples along rows and features along columns.</p></td>
-        <td><em>required</em></td>
-      </tr>
-      <tr>
-        <td><code>labels</code></td>
-        <td><code>np.ndarray</code></td>
-        <td><p>Numpy array containing metastable state prediction probabilities for a perturbed neighborhood corresponding to a specific sample. Includes the state for which the original sample has the highest probability.</p></td>
-        <td><em>required</em></td>
-      </tr>
-      <tr>
-        <td><code>seed</code></td>
-        <td><code>int</code></td>
-        <td><p>Random seed.</p></td>
-        <td><em>required</em></td>
-      </tr>
-      <tr>
-        <td><code>alpha</code></td>
-        <td><code>float</code></td>
-        <td><p>L2 norm of Ridge regression (Default: 1.0).</p></td>
-        <td><code>1.0</code></td>
-      </tr>
-  </tbody>
-</table>
-<p><strong>Returns:</strong></p>
-<table>
-  <thead>
-    <tr>
-      <th>Type</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><code>np.ndarray</code></td>
-      <td><p>Numpy array with coefficients of all the features of the fitted linear model.
-float: Intercept of the fitted linear model.</p></td>
-    </tr>
-  </tbody>
-</table>
-        <details class="quote">
-          <summary>Source code in <code>MDTerp/final_analysis.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">SGDreg</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Function for implementing linear regression using stochastic gradient descent.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        data (np.ndarray): Numpy 2D array containing the similarity-weighted training data for the black-box model. Samples along rows and features along columns.</span>
-<span class="sd">        labels (np.ndarray): Numpy array containing metastable state prediction probabilities for a perturbed neighborhood corresponding to a specific sample. Includes the state for which the original sample has the highest probability.</span>
-<span class="sd">        seed (int): Random seed.</span>
-<span class="sd">        alpha (float): L2 norm of Ridge regression (Default: 1.0).</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        np.ndarray: Numpy array with coefficients of all the features of the fitted linear model.</span>
-<span class="sd">        float: Intercept of the fitted linear model.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">clf</span> <span class="o">=</span> <span class="n">Ridge</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">random_state</span> <span class="o">=</span> <span class="n">seed</span><span class="p">,</span> <span class="n">solver</span> <span class="o">=</span> <span class="s1">&#39;saga&#39;</span><span class="p">)</span>
-    <span class="n">clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="n">labels</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
-    <span class="n">coefficients</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">coef_</span>
-    <span class="n">intercept</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">intercept_</span>
-    <span class="k">return</span> <span class="n">coefficients</span><span class="p">,</span> <span class="n">intercept</span>
-</code></pre></div>
-        </details>
-    </div>
-
-  </div>
 
 
 
@@ -1370,7 +1257,7 @@ float: Intercept of the fitted linear model.</p></td>
         <span class="n">range_theta_mast</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">charac_theta_mast</span><span class="p">)[</span><span class="n">i</span><span class="p">]</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">charac_theta_mast</span><span class="p">)[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
 
       <span class="n">prime_model</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">range_theta_mast</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">best_parameters_converted</span><span class="p">)[</span><span class="n">prime_model</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">best_parameters_converted</span><span class="p">)[</span><span class="n">prime_model</span><span class="o">+</span><span class="mi">1</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">best_parameters_converted</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">best_unfaithfulness_master</span><span class="p">)</span>
 </code></pre></div>
         </details>
     </div>
@@ -1383,11 +1270,11 @@ float: Intercept of the fitted linear model.</p></td>
 
 
 
-<h2 id="MDTerp.final_analysis.interp" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">interp</span><span class="p">(</span><span class="n">coef_array</span><span class="p">)</span></code>
+<h2 id="MDTerp.final_analysis.interpretation_entropy" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">interpretation_entropy</span><span class="p">(</span><span class="n">coef_array</span><span class="p">)</span></code>
 
 
-<a href="#MDTerp.final_analysis.interp" class="headerlink" title="Permanent link">&para;</a></h2>
+<a href="#MDTerp.final_analysis.interpretation_entropy" class="headerlink" title="Permanent link">&para;</a></h2>
 
     <div class="doc doc-contents ">
 
@@ -1429,7 +1316,7 @@ float: Intercept of the fitted linear model.</p></td>
 </table>
         <details class="quote">
           <summary>Source code in <code>MDTerp/final_analysis.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">interp</span><span class="p">(</span><span class="n">coef_array</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">interpretation_entropy</span><span class="p">(</span><span class="n">coef_array</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">  </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Function for computing interpretation entropy of the coefficients of a fitted linear model.</span>
 
@@ -1447,83 +1334,6 @@ float: Intercept of the fitted linear model.</p></td>
     <span class="k">else</span><span class="p">:</span>
       <span class="n">t</span> <span class="o">+=</span> <span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
   <span class="k">return</span> <span class="o">-</span><span class="n">t</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">coef_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-</code></pre></div>
-        </details>
-    </div>
-
-  </div>
-
-
-
-  <div class="doc doc-object doc-function">
-
-
-
-<h2 id="MDTerp.final_analysis.similarity_kernel" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">similarity_kernel</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">kernel_width</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span></code>
-
-
-<a href="#MDTerp.final_analysis.similarity_kernel" class="headerlink" title="Permanent link">&para;</a></h2>
-
-    <div class="doc doc-contents ">
-
-      <p>Function for computing similarity∈[0,1] of a perturbed sample with respect to the original sample using LDA transformed distance.</p>
-
-<p><strong>Parameters:</strong></p>
-<table>
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Description</th>
-      <th>Default</th>
-    </tr>
-  </thead>
-  <tbody>
-      <tr>
-        <td><code>data</code></td>
-        <td><code>np.ndarray</code></td>
-        <td><p>LDA transformed data.</p></td>
-        <td><em>required</em></td>
-      </tr>
-      <tr>
-        <td><code>kernel_width</code></td>
-        <td><code>float</code></td>
-        <td><p>Width of the similarity kernel (Default: 1.0).</p></td>
-        <td><code>1.0</code></td>
-      </tr>
-  </tbody>
-</table>
-<p><strong>Returns:</strong></p>
-<table>
-  <thead>
-    <tr>
-      <th>Type</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><code>np.ndarray</code></td>
-      <td><p>Similarity∈[0,1] of neighborhood.</p></td>
-    </tr>
-  </tbody>
-</table>
-        <details class="quote">
-          <summary>Source code in <code>MDTerp/final_analysis.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">similarity_kernel</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">kernel_width</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Function for computing similarity∈[0,1] of a perturbed sample with respect to the original sample using LDA transformed distance.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        data (np.ndarray): LDA transformed data.</span>
-<span class="sd">        kernel_width (float): Width of the similarity kernel (Default: 1.0).</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        np.ndarray: Similarity∈[0,1] of neighborhood.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">distances</span> <span class="o">=</span> <span class="n">met</span><span class="o">.</span><span class="n">pairwise_distances</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span><span class="n">metric</span><span class="o">=</span><span class="s1">&#39;euclidean&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">distances</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">kernel_width</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
 </code></pre></div>
         </details>
     </div>
@@ -1676,14 +1486,14 @@ float: Intercept of the fitted linear model.</p></td>
 
   <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="o">-</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
     <span class="n">models</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">inherited_nonzero</span><span class="p">,</span> <span class="n">inherited_zero</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
-    <span class="n">result_a</span><span class="p">,</span> <span class="n">result_b</span> <span class="o">=</span> <span class="n">SGDreg</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span><span class="n">models</span><span class="p">[</span><span class="n">i</span><span class="p">]],</span> <span class="n">labels</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span>
+    <span class="n">result_a</span><span class="p">,</span> <span class="n">result_b</span> <span class="o">=</span> <span class="n">ridge_regression</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span><span class="n">models</span><span class="p">[</span><span class="n">i</span><span class="p">]],</span> <span class="n">labels</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span>
     <span class="n">parameters</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
     <span class="n">parameters</span><span class="p">[</span><span class="n">models</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> <span class="n">result_a</span>
     <span class="n">parameters</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">result_b</span>
     <span class="n">TERP_SGD_parameters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span>
     <span class="n">residual</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">corrcoef</span><span class="p">(</span><span class="n">labels</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],(</span><span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">data</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))))</span><span class="nd">@parameters</span><span class="p">[:])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)[:,</span><span class="mi">0</span><span class="p">])[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">TERP_SGD_unfaithfulness</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">residual</span><span class="p">))</span>
-    <span class="n">TERP_SGD_interp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">interp</span><span class="p">(</span><span class="n">TERP_SGD_parameters</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="n">TERP_SGD_interp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">interpretation_entropy</span><span class="p">(</span><span class="n">TERP_SGD_parameters</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
     <span class="n">TERP_SGD_IFE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">TERP_SGD_unfaithfulness</span><span class="p">)</span>
 
   <span class="n">best_model</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">TERP_SGD_IFE</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
@@ -1864,7 +1674,7 @@ float: Intercept of the fitted linear model.</p></td>
       <div class="md-copyright">
   
     <div class="md-copyright__highlight">
-      Copyright &copy; 2024 - 2024 shams mehdi
+      Copyright &copy; 2024 - 2026 shams mehdi
     </div>
   
   

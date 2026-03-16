@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.5">
     
     
       
@@ -567,6 +567,33 @@
       
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../visualization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Visualization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
     
   
   
@@ -580,10 +607,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" checked>
         
           
-          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="0">
             
   
   
@@ -601,8 +628,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_9">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_10">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -751,10 +778,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#MDTerp.utils.picker_fn" class="md-nav__link">
+  <a href="#MDTerp.utils.make_result" class="md-nav__link">
     <span class="md-ellipsis">
       
-        picker_fn()
+        make_result()
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#MDTerp.utils.select_transition_points" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        select_transition_points()
       
     </span>
   </a>
@@ -943,10 +981,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#MDTerp.utils.picker_fn" class="md-nav__link">
+  <a href="#MDTerp.utils.make_result" class="md-nav__link">
     <span class="md-ellipsis">
       
-        picker_fn()
+        make_result()
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#MDTerp.utils.select_transition_points" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        select_transition_points()
       
     </span>
   </a>
@@ -1020,7 +1069,7 @@
 
     <div class="doc doc-contents ">
 
-      <p>Function summarizing MDTerp results for all the transitions present in the dataset.</p>
+      <p>Get the n-th most important feature for each analyzed sample.</p>
 
 <p><strong>Parameters:</strong></p>
 <table>
@@ -1034,16 +1083,16 @@
   </thead>
   <tbody>
       <tr>
-        <td><code>all_results_loc</code></td>
+        <td><code>all_result_loc</code></td>
         <td><code>str</code></td>
-        <td><p>Location to save MDTerp results.</p></td>
+        <td><p>Path to the MDTerp_results_all.pkl file.</p></td>
         <td><em>required</em></td>
       </tr>
       <tr>
-        <td><code>importance_coverage</code></td>
-        <td><code>float</code></td>
-        <td><p>For a specific transition, sets a cutoff for the sum of the most important features in descending order.</p></td>
-        <td><em>required</em></td>
+        <td><code>n</code></td>
+        <td><code>int</code></td>
+        <td><p>Rank of the dominant feature to extract (0 = most important).</p></td>
+        <td><code>0</code></td>
       </tr>
   </tbody>
 </table>
@@ -1058,7 +1107,8 @@
   <tbody>
     <tr>
       <td><code>dict</code></td>
-      <td><p>Dictionary with keys representing detected transitions. E.g., key '3_8' means transition between index 3 and index 8 according to the prob array. Values are lists representing feature importance using the length of the list equaling the number of features in the provided dataset.</p></td>
+      <td><p>Dict mapping sample index to the feature index of the n-th most
+important feature.</p></td>
     </tr>
   </tbody>
 </table>
@@ -1066,14 +1116,15 @@
           <summary>Source code in <code>MDTerp/utils.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">dominant_feature</span><span class="p">(</span><span class="n">all_result_loc</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Function summarizing MDTerp results for all the transitions present in the dataset.</span>
+<span class="sd">    Get the n-th most important feature for each analyzed sample.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        all_results_loc (str): Location to save MDTerp results.</span>
-<span class="sd">        importance_coverage (float): For a specific transition, sets a cutoff for the sum of the most important features in descending order.</span>
+<span class="sd">        all_result_loc: Path to the MDTerp_results_all.pkl file.</span>
+<span class="sd">        n: Rank of the dominant feature to extract (0 = most important).</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        dict: Dictionary with keys representing detected transitions. E.g., key &#39;3_8&#39; means transition between index 3 and index 8 according to the prob array. Values are lists representing feature importance using the length of the list equaling the number of features in the provided dataset.</span>
+<span class="sd">        Dict mapping sample index to the feature index of the n-th most</span>
+<span class="sd">        important feature.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">all_result_loc</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">loaded_dict</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>  
@@ -1266,12 +1317,23 @@
 <span class="sd">        Logger: Logger object created using Python&#39;s built-in logging module.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> </span><span class="si">%(name)-15s</span><span class="s1"> </span><span class="si">%(levelname)-8s</span><span class="s1"> </span><span class="si">%(message)s</span><span class="s1">&#39;</span>
-    <span class="n">datefmt</span><span class="o">=</span><span class="s1">&#39;%m-</span><span class="si">%d</span><span class="s1">-%y %H:%M:%S&#39;</span>
-    <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span><span class="nb">format</span><span class="o">=</span><span class="n">fmt</span><span class="p">,</span><span class="n">datefmt</span><span class="o">=</span><span class="n">datefmt</span><span class="p">,</span><span class="n">filename</span><span class="o">=</span><span class="n">save_dir</span><span class="o">+</span><span class="s1">&#39;/MDTerp_summary.log&#39;</span><span class="p">,</span><span class="n">filemode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
-    <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;initialization&#39;</span><span class="p">)</span>
+    <span class="n">datefmt</span> <span class="o">=</span> <span class="s1">&#39;%m-</span><span class="si">%d</span><span class="s1">-%y %H:%M:%S&#39;</span>
+    <span class="n">formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="n">fmt</span><span class="p">,</span> <span class="n">datefmt</span><span class="o">=</span><span class="n">datefmt</span><span class="p">)</span>
+
+    <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;MDTerp&#39;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+    <span class="c1"># Clear any existing handlers from previous runs</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">handlers</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+    <span class="n">file_handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="p">(</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">save_dir</span><span class="p">,</span> <span class="s1">&#39;MDTerp_summary.log&#39;</span><span class="p">),</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span>
+    <span class="p">)</span>
+    <span class="n">file_handler</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+    <span class="n">file_handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">file_handler</span><span class="p">)</span>
+
     <span class="n">console_handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">()</span>
     <span class="n">console_handler</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
-    <span class="n">formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="n">fmt</span><span class="p">,</span><span class="n">datefmt</span><span class="o">=</span><span class="n">datefmt</span><span class="p">)</span>
     <span class="n">console_handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">console_handler</span><span class="p">)</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="mi">100</span><span class="o">*</span><span class="s1">&#39;-&#39;</span><span class="p">)</span>
@@ -1287,20 +1349,20 @@
 
 
 
-
   <div class="doc doc-object doc-function">
 
 
 
-<h2 id="MDTerp.utils.picker_fn" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">picker_fn</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="n">threshold</span><span class="p">,</span> <span class="n">point_max</span><span class="p">)</span></code>
+<h2 id="MDTerp.utils.make_result" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">make_result</span><span class="p">(</span><span class="n">feature_type_indices</span><span class="p">,</span> <span class="n">feature_names</span><span class="p">,</span> <span class="n">importance</span><span class="p">)</span></code>
 
 
-<a href="#MDTerp.utils.picker_fn" class="headerlink" title="Permanent link">&para;</a></h2>
+<a href="#MDTerp.utils.make_result" class="headerlink" title="Permanent link">&para;</a></h2>
 
     <div class="doc doc-contents ">
 
-      <p>Function for picking points at the transition state ensemble. Uses provided data and metastable state probability from the black-box model.</p>
+      <p>Map importance values from the analysis feature space back to the
+original feature space, combining sin/cos pairs.</p>
 
 <p><strong>Parameters:</strong></p>
 <table>
@@ -1314,21 +1376,22 @@
   </thead>
   <tbody>
       <tr>
-        <td><code>prob</code></td>
-        <td><code>np.ndarray</code></td>
-        <td><p>Numpy 2D array containing metastable state prediction probabilities from the black-box model. Rows represent samples, and the number of columns represents the number of states. Each row should sum to 1.</p></td>
+        <td><code>feature_type_indices</code></td>
+        <td><code>list</code></td>
+        <td><p>List of [numeric_indices, angle_indices,
+sin_indices, cos_indices] arrays.</p></td>
         <td><em>required</em></td>
       </tr>
       <tr>
-        <td><code>threshold</code></td>
-        <td><code>float</code></td>
-        <td><p>Threshold for identifying if a sample belongs to a transition state predicted by the black-box model. If the metastable state probability &gt; threshold for two different classes for a specific sample, it's suitable for analysis.</p></td>
+        <td><code>feature_names</code></td>
+        <td><code>list</code></td>
+        <td><p>List of feature names in order.</p></td>
         <td><em>required</em></td>
       </tr>
       <tr>
-        <td><code>point_max</code></td>
-        <td><code>int</code></td>
-        <td><p>If too many suitable points exist for a specific transition (e.g., transition between metastable state 3 and 8), point_max sets the maximum number of points chosen for analysis. Points are chosen from a uniform distribution.</p></td>
+        <td><code>importance</code></td>
+        <td><code>ndarray</code></td>
+        <td><p>Raw importance array from the final model.</p></td>
         <td><em>required</em></td>
       </tr>
   </tbody>
@@ -1343,35 +1406,179 @@
   </thead>
   <tbody>
     <tr>
-      <td><code>dict</code></td>
-      <td><p>Dictionary with keys representing detected transitions. E.g., key '3_8' means transition between index 3 and index 8 according to the prob array. Values represent chosen samples/rows in the provided dataset undergoing this transition.</p></td>
+      <td><code>list</code></td>
+      <td><p>List of importance values aligned with feature_names ordering.</p></td>
     </tr>
   </tbody>
 </table>
         <details class="quote">
           <summary>Source code in <code>MDTerp/utils.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">picker_fn</span><span class="p">(</span><span class="n">prob</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">point_max</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">make_result</span><span class="p">(</span>
+    <span class="n">feature_type_indices</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+    <span class="n">feature_names</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+    <span class="n">importance</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Function for picking points at the transition state ensemble. Uses provided data and metastable state probability from the black-box model.</span>
+<span class="sd">    Map importance values from the analysis feature space back to the</span>
+<span class="sd">    original feature space, combining sin/cos pairs.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        prob (np.ndarray): Numpy 2D array containing metastable state prediction probabilities from the black-box model. Rows represent samples, and the number of columns represents the number of states. Each row should sum to 1.</span>
-<span class="sd">        threshold (float): Threshold for identifying if a sample belongs to a transition state predicted by the black-box model. If the metastable state probability &gt; threshold for two different classes for a specific sample, it&#39;s suitable for analysis.</span>
-<span class="sd">        point_max (int): If too many suitable points exist for a specific transition (e.g., transition between metastable state 3 and 8), point_max sets the maximum number of points chosen for analysis. Points are chosen from a uniform distribution.</span>
+<span class="sd">        feature_type_indices: List of [numeric_indices, angle_indices,</span>
+<span class="sd">            sin_indices, cos_indices] arrays.</span>
+<span class="sd">        feature_names: List of feature names in order.</span>
+<span class="sd">        importance: Raw importance array from the final model.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        dict: Dictionary with keys representing detected transitions. E.g., key &#39;3_8&#39; means transition between index 3 and index 8 according to the prob array. Values represent chosen samples/rows in the provided dataset undergoing this transition.</span>
+<span class="sd">        List of importance values aligned with feature_names ordering.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">transition_dict</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">prob</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
-        <span class="n">sorted_ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">prob</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:])[::</span><span class="o">-</span><span class="mi">1</span><span class="p">][:</span><span class="mi">2</span><span class="p">])</span>
-        <span class="n">sorted_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">prob</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:])[::</span><span class="o">-</span><span class="mi">1</span><span class="p">][:</span><span class="mi">2</span><span class="p">]</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">sorted_val</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">&gt;=</span><span class="n">threshold</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">sorted_val</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">&gt;=</span><span class="n">threshold</span><span class="p">):</span>
-            <span class="n">transition_dict</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">sorted_ind</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">sorted_ind</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">transition_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-        <span class="n">transition_dict</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">transition_dict</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">size</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">point_max</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">transition_dict</span><span class="p">[</span><span class="n">i</span><span class="p">])),</span> <span class="n">replace</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">feature_type_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">importance</span><span class="p">[</span><span class="n">feature_type_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">i</span><span class="p">]])</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">feature_type_indices</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">importance</span><span class="p">[</span><span class="n">feature_type_indices</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">i</span><span class="p">]])</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">feature_type_indices</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">importance</span><span class="p">[</span><span class="n">feature_type_indices</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="n">i</span><span class="p">]]</span>
+            <span class="o">+</span> <span class="n">importance</span><span class="p">[</span><span class="n">feature_type_indices</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="n">i</span><span class="p">]]</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span>
+</code></pre></div>
+        </details>
+    </div>
 
-    <span class="k">return</span> <span class="n">transition_dict</span>
+  </div>
+
+
+
+  <div class="doc doc-object doc-function">
+
+
+
+<h2 id="MDTerp.utils.select_transition_points" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">select_transition_points</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span> <span class="n">point_max</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">prob_threshold_min</span><span class="o">=</span><span class="mf">0.475</span><span class="p">)</span></code>
+
+
+<a href="#MDTerp.utils.select_transition_points" class="headerlink" title="Permanent link">&para;</a></h2>
+
+    <div class="doc doc-contents ">
+
+      <p>Select transition-state samples with adaptive per-transition thresholds.</p>
+<p>For each transition, selects up to point_max samples closest to the
+decision boundary (highest min-of-top-2 probabilities). The effective
+threshold is determined automatically per transition, with
+prob_threshold_min as the absolute floor.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>prob</code></td>
+        <td><code>ndarray</code></td>
+        <td><p>2D array of state probabilities (samples x states). Rows sum to 1.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>point_max</code></td>
+        <td><code>int</code></td>
+        <td><p>Target number of points per transition (default: 50).</p></td>
+        <td><code>50</code></td>
+      </tr>
+      <tr>
+        <td><code>prob_threshold_min</code></td>
+        <td><code>float</code></td>
+        <td><p>Minimum allowed probability threshold (default: 0.475).</p></td>
+        <td><code>0.475</code></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>points</code></td>
+      <td><p>Dict mapping transition keys (e.g., "0_1") to arrays of
+    selected sample indices.
+thresholds: Dict mapping transition keys to the effective threshold
+    used for that transition.</p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>MDTerp/utils.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">select_transition_points</span><span class="p">(</span>
+    <span class="n">prob</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">point_max</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span>
+    <span class="n">prob_threshold_min</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.475</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Select transition-state samples with adaptive per-transition thresholds.</span>
+
+<span class="sd">    For each transition, selects up to point_max samples closest to the</span>
+<span class="sd">    decision boundary (highest min-of-top-2 probabilities). The effective</span>
+<span class="sd">    threshold is determined automatically per transition, with</span>
+<span class="sd">    prob_threshold_min as the absolute floor.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        prob: 2D array of state probabilities (samples x states). Rows sum to 1.</span>
+<span class="sd">        point_max: Target number of points per transition (default: 50).</span>
+<span class="sd">        prob_threshold_min: Minimum allowed probability threshold (default: 0.475).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        points: Dict mapping transition keys (e.g., &quot;0_1&quot;) to arrays of</span>
+<span class="sd">            selected sample indices.</span>
+<span class="sd">        thresholds: Dict mapping transition keys to the effective threshold</span>
+<span class="sd">            used for that transition.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+
+    <span class="n">candidates</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">prob</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="n">top2_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">prob</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:])[::</span><span class="o">-</span><span class="mi">1</span><span class="p">][:</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">top2_values</span> <span class="o">=</span> <span class="n">prob</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">top2_indices</span><span class="p">]</span>
+        <span class="n">min_top2</span> <span class="o">=</span> <span class="n">top2_values</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">min_top2</span> <span class="o">&gt;=</span> <span class="n">prob_threshold_min</span><span class="p">:</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">top2_indices</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">top2_indices</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">candidates</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">i</span><span class="p">,</span> <span class="n">min_top2</span><span class="p">))</span>
+
+    <span class="n">points</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">thresholds</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">for</span> <span class="n">transition</span><span class="p">,</span> <span class="n">cands</span> <span class="ow">in</span> <span class="n">candidates</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">cands_sorted</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">cands</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cands_sorted</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">point_max</span><span class="p">:</span>
+            <span class="n">selected</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cands_sorted</span><span class="p">]</span>
+            <span class="n">effective_threshold</span> <span class="o">=</span> <span class="n">cands_sorted</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="n">cands_sorted</span> <span class="k">else</span> <span class="n">prob_threshold_min</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cands_sorted</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">point_max</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Transition </span><span class="si">{</span><span class="n">transition</span><span class="si">}</span><span class="s2">: only </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">cands_sorted</span><span class="p">)</span><span class="si">}</span><span class="s2"> points found &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;at minimum threshold </span><span class="si">{</span><span class="n">prob_threshold_min</span><span class="si">}</span><span class="s2"> &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;(requested </span><span class="si">{</span><span class="n">point_max</span><span class="si">}</span><span class="s2">)&quot;</span>
+                <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">selected</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cands_sorted</span><span class="p">[:</span><span class="n">point_max</span><span class="p">]]</span>
+            <span class="n">effective_threshold</span> <span class="o">=</span> <span class="n">cands_sorted</span><span class="p">[</span><span class="n">point_max</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">points</span><span class="p">[</span><span class="n">transition</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">selected</span><span class="p">)</span>
+        <span class="n">thresholds</span><span class="p">[</span><span class="n">transition</span><span class="p">]</span> <span class="o">=</span> <span class="n">effective_threshold</span>
+
+    <span class="k">return</span> <span class="n">points</span><span class="p">,</span> <span class="n">thresholds</span>
 </code></pre></div>
         </details>
     </div>
@@ -1568,7 +1775,7 @@
       <div class="md-copyright">
   
     <div class="md-copyright__highlight">
-      Copyright &copy; 2024 - 2024 shams mehdi
+      Copyright &copy; 2024 - 2026 shams mehdi
     </div>
   
   
