@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite both the software and the paper."
+title: "MDTerp"
+version: 2.0.0
+license: MIT
+authors:
+  - family-names: Mehdi
+    given-names: Shams
+    email: shamsmehdi222@gmail.com
+preferred-citation:
+  type: article
+  title: "Thermodynamics-inspired explanations of artificial intelligence"
+  authors:
+    - family-names: Mehdi
+      given-names: Shams
+    - family-names: Tiwary
+      given-names: Pratyush
+  journal: "Nature Communications"
+  volume: "15"
+  pages: "3974"
+  year: 2024
+  doi: "10.1038/s41467-024-47258-w"

@@ -4,7 +4,7 @@ site_author: shams-mehdi
 site_url: https://shams-mehdi.github.io/MDTerp
 repo_url: https://github.com/shams-mehdi/MDTerp
 
-copyright: "Copyright &copy; 2024 - 2024 shams mehdi"
+copyright: "Copyright &copy; 2024 - 2026 shams mehdi"
 
 theme:
     palette:
@@ -82,6 +82,7 @@ nav:
     - Examples:
         - examples/MDTerp_demo1.ipynb
         - examples/MDTerp_demo2.ipynb
+    - Visualization: visualization.md
     - API Reference:
           - MDTerp module: MDTerp.md
           - utils module: utils.md

@@ -3,47 +3,11 @@ MDTerp.final_analysis.py – Final MDTerp round for implementing forward feature
 """
 import numpy as np
 import os
-import sklearn.metrics as met
 import copy
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as lda
-from sklearn.linear_model import Ridge
-from typing import Tuple
+from MDTerp.models import similarity_kernel, ridge_regression
 
-def similarity_kernel(data: np.ndarray, kernel_width: float = 1.0) -> np.ndarray:
-    """
-    Function for computing similarity∈[0,1] of a perturbed sample with respect to the original sample using LDA transformed distance.
-
-    Args:
-        data (np.ndarray): LDA transformed data.
-        kernel_width (float): Width of the similarity kernel (Default: 1.0).
-
-    Returns:
-        np.ndarray: Similarity∈[0,1] of neighborhood.
-    """
-    distances = met.pairwise_distances(data,data[0].reshape(1, -1),metric='euclidean').ravel()
-    return np.sqrt(np.exp(-(distances ** 2) / kernel_width ** 2))
-
-def SGDreg(data: np.ndarray, labels: np.ndarray, seed: int, alpha: float = 1.0) -> Tuple[np.ndarray, float]:
-    """
-    Function for implementing linear regression using stochastic gradient descent.
-
-    Args:
-        data (np.ndarray): Numpy 2D array containing the similarity-weighted training data for the black-box model. Samples along rows and features along columns.
-        labels (np.ndarray): Numpy array containing metastable state prediction probabilities for a perturbed neighborhood corresponding to a specific sample. Includes the state for which the original sample has the highest probability.
-        seed (int): Random seed.
-        alpha (float): L2 norm of Ridge regression (Default: 1.0).
-        
-    Returns:
-        np.ndarray: Numpy array with coefficients of all the features of the fitted linear model.
-        float: Intercept of the fitted linear model.
-    """
-    clf = Ridge(alpha, random_state = seed, solver = 'saga')
-    clf.fit(data,labels.ravel())
-    coefficients = clf.coef_
-    intercept = clf.intercept_
-    return coefficients, intercept
-
-def interp(coef_array: np.ndarray) -> float:
+def interpretation_entropy(coef_array: np.ndarray) -> float:
   """
     Function for computing interpretation entropy of the coefficients of a fitted linear model.
 
@@ -96,14 +60,14 @@ def unfaithfulness_calc(k: int, N: int, data: np.ndarray, predict_proba: np.ndar
 
   for i in range(N-k+1):
     models.append(np.append(inherited_nonzero, inherited_zero[i]))
-    result_a, result_b = SGDreg(data[:,models[i]], labels, seed)
+    result_a, result_b = ridge_regression(data[:,models[i]], labels, seed)
     parameters = np.zeros((N+1))
     parameters[models[i]] = result_a
     parameters[-1] = result_b
     TERP_SGD_parameters.append(parameters)
     residual = np.corrcoef(labels[:,0],(np.column_stack((data, np.ones((data.shape[0]))))@parameters[:]).reshape(-1,1)[:,0])[0,1]
     TERP_SGD_unfaithfulness.append(1-np.absolute(residual))
-    TERP_SGD_interp.append(interp(TERP_SGD_parameters[-1][:-1]))
+    TERP_SGD_interp.append(interpretation_entropy(TERP_SGD_parameters[-1][:-1]))
     TERP_SGD_IFE = np.array(TERP_SGD_unfaithfulness)
 
   best_model = np.argsort(TERP_SGD_IFE)[0]
@@ -219,4 +183,4 @@ def final_model(neighborhood_data: np.ndarray, pred_proba: np.ndarray, unf_thres
         range_theta_mast.append(np.array(charac_theta_mast)[i]-np.array(charac_theta_mast)[i-1])
     
       prime_model = np.argmin(np.array(range_theta_mast))
-    return np.absolute(np.array(best_parameters_converted)[prime_model+1])
+    return np.absolute(np.array(best_parameters_converted)[prime_model+1]), np.absolute(np.array(best_parameters_converted)), np.array(best_unfaithfulness_master)

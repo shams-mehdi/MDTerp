@@ -3,45 +3,9 @@ MDTerp.init_analysis.py – Initial MDTerp round for discarding irrelevant featu
 """
 import numpy as np
 import os
-import sklearn.metrics as met
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as lda
-from sklearn.linear_model import Ridge
-from typing import Tuple
+from MDTerp.models import similarity_kernel, ridge_regression
 
-def similarity_kernel(data: np.ndarray, kernel_width: float = 1.0) -> np.ndarray:
-    """
-    Function for computing similarity∈[0,1] of a perturbed sample with respect to the original sample using LDA transformed distance.
-
-    Args:
-        data (np.ndarray): LDA transformed data.
-        kernel_width (float): Width of the similarity kernel (Default: 1.0). Since LDA was used for dimensionality reduction, no need to tune this hyperparameter.
-
-    Returns:
-        np.ndarray: Similarity∈[0,1] of neighborhood.
-    """
-    distances = met.pairwise_distances(data,data[0].reshape(1, -1),metric='euclidean').ravel()
-    return np.sqrt(np.exp(-(distances ** 2) / kernel_width ** 2))
-
-def SGDreg(data: np.ndarray, labels: np.ndarray, seed: int, alpha: float) -> Tuple[np.ndarray, float]:
-    """
-    Function for implementing linear regression using stochastic gradient descent.
-
-    Args:
-        data (np.ndarray): Numpy 2D array containing the similarity-weighted training data for the black-box model. Samples along rows and features along columns.
-        labels (np.ndarray): Numpy array containing metastable state prediction probabilities for a perturbed neighborhood corresponding to a specific sample. Includes the state for which the original sample has the highest probability.
-        seed (int): Random seed.
-        alpha (float): L2 norm of Ridge regression.
-        
-    Returns:
-        np.ndarray: Numpy array with coefficients of all the features of the fitted linear model.
-        float: Intercept of the fitted linear model.
-    """
-    clf = Ridge(alpha, random_state = seed, solver = 'saga')
-    clf.fit(data,labels.ravel())
-    coefficients = clf.coef_
-    intercept = clf.intercept_
-    return coefficients, intercept
-    
 def init_model(neighborhood_data: np.ndarray, pred_proba: np.ndarray, cutoff: int, given_indices: np.ndarray, seed: int, alpha: float) -> list:
     """
     Function for fitting the initial linear model for discarding irrelevant features and choosing promising features for detailed analysis.
@@ -73,7 +37,7 @@ def init_model(neighborhood_data: np.ndarray, pred_proba: np.ndarray, cutoff: in
     data = neighborhood_data*(weights**0.5).reshape(-1,1)
     labels = target.reshape(-1,1)*(weights.reshape(-1,1)**0.5)
     
-    coefficients_selection, intercept_selection = SGDreg(data, labels, seed, alpha)
+    coefficients_selection, intercept_selection = ridge_regression(data, labels, seed, alpha)
     selected_features = np.argsort(np.absolute(coefficients_selection))[::-1][:cutoff]
 
     return selected_features

@@ -1,218 +1,168 @@
 """
-MDTerp.checkpoint.py – Checkpoint and resume functionality.
+MDTerp.checkpoint -- Per-point result persistence and crash recovery.
 
-This module provides checkpointing capabilities for MDTerp analyses,
-allowing runs to be resumed after crashes or interruptions. Checkpoints
-track completed transitions and individual sample analyses.
+Saves each analyzed point as an individual .npz file so that interrupted runs
+can resume from where they left off.
 """
-import os
-import json
-import pickle
 import numpy as np
-from typing import Dict, List, Tuple, Optional, Set
-from datetime import datetime
+import json
+import os
+import glob
+from typing import Dict, Set, Tuple
+import pickle
 
 
-class CheckpointManager:
+def save_point_result(
+    save_dir: str,
+    transition: str,
+    point_index: int,
+    sample_index: int,
+    importance: np.ndarray,
+    importance_all: np.ndarray,
+    unfaithfulness_all: np.ndarray,
+    selected_features: np.ndarray,
+) -> str:
     """
-    Manages checkpointing and resumption of MDTerp analyses.
+    Save a single point's analysis result to disk.
 
-    Tracks completed analyses at both transition and sample levels,
-    enabling efficient resumption of interrupted runs without data loss
-    or redundant computation.
+    Args:
+        save_dir: Directory to save results.
+        transition: Transition key string (e.g., "0_1").
+        point_index: Index of the point within this transition.
+        sample_index: Original row index in the training data.
+        importance: Final importance vector for all features.
+        importance_all: Importance vectors for all k values.
+        unfaithfulness_all: Unfaithfulness values for all k values.
+        selected_features: Feature indices kept after round 1.
+
+    Returns:
+        Path to the saved result file.
     """
+    filename = f"{transition}_point{point_index}_result.npz"
+    filepath = os.path.join(save_dir, filename)
+    np.savez(
+        filepath,
+        sample_index=sample_index,
+        transition=transition,
+        importance=np.array(importance),
+        importance_all=importance_all,
+        unfaithfulness_all=unfaithfulness_all,
+        selected_features=selected_features,
+    )
+    return filepath
 
-    def __init__(self, save_dir: str):
-        """
-        Initialize checkpoint manager.
 
-        Args:
-            save_dir: Directory for saving results and checkpoints.
-        """
-        self.save_dir = save_dir
-        self.checkpoint_file = os.path.join(save_dir, 'mdterp_checkpoint.json')
-        self.results_file = os.path.join(save_dir, 'MDTerp_results_all.pkl')
-        self.feature_names_file = os.path.join(save_dir, 'MDTerp_feature_names.npy')
+def scan_completed_points(save_dir: str) -> Set[Tuple[str, int]]:
+    """
+    Scan the result directory for previously completed point results.
 
-    def load_checkpoint(self) -> Tuple[Dict, Optional[List[str]], Set[int]]:
-        """
-        Load existing checkpoint data if available.
+    Args:
+        save_dir: Directory containing result files.
 
-        Returns:
-            Tuple of (results_dict, feature_names, completed_samples):
-            - results_dict: Previously computed results
-            - feature_names: Feature names (None if not yet computed)
-            - completed_samples: Set of sample indices already analyzed
-
-        Raises:
-            None. Returns empty state if no checkpoint exists.
-        """
-        results = {}
-        feature_names = None
-        completed_samples = set()
-
-        # Load checkpoint metadata
-        if os.path.exists(self.checkpoint_file):
-            try:
-                with open(self.checkpoint_file, 'r') as f:
-                    checkpoint_data = json.load(f)
-
-                completed_samples = set(checkpoint_data.get('completed_samples', []))
-                print(f"Found checkpoint with {len(completed_samples)} completed samples")
-
-            except (json.JSONDecodeError, IOError) as e:
-                print(f"Warning: Could not load checkpoint file: {e}")
-                print("Starting fresh analysis")
-
-        # Load existing results
-        if os.path.exists(self.results_file):
-            try:
-                with open(self.results_file, 'rb') as f:
-                    results = pickle.load(f)
-                print(f"Loaded {len(results)} existing results")
-            except (pickle.PickleError, IOError) as e:
-                print(f"Warning: Could not load results file: {e}")
-
-        # Load feature names
-        if os.path.exists(self.feature_names_file):
-            try:
-                feature_names = np.load(self.feature_names_file, allow_pickle=True)
-                print(f"Loaded {len(feature_names)} feature names")
-            except (IOError, ValueError) as e:
-                print(f"Warning: Could not load feature names: {e}")
-
-        return results, feature_names, completed_samples
-
-    def save_checkpoint(
-        self,
-        results: Dict,
-        feature_names: List[str],
-        completed_samples: Set[int],
-        metadata: Optional[Dict] = None
-    ) -> None:
-        """
-        Save current analysis state to checkpoint.
-
-        Args:
-            results: Dictionary of computed results (sample_idx -> [transition, importance])
-            feature_names: List of feature names
-            completed_samples: Set of completed sample indices
-            metadata: Optional additional metadata to save
-
-        Saves:
-            - Checkpoint JSON with completed sample tracking
-            - Results pickle file
-            - Feature names array
-        """
-        # Save checkpoint metadata
-        checkpoint_data = {
-            'completed_samples': list(completed_samples),
-            'total_samples': len(results),
-            'last_updated': datetime.now().isoformat(),
-            'metadata': metadata or {}
-        }
-
+    Returns:
+        Set of (transition, point_index) tuples already completed.
+    """
+    completed = set()
+    pattern = os.path.join(save_dir, "*_point*_result.npz")
+    for filepath in glob.glob(pattern):
+        basename = os.path.basename(filepath)
+        name = basename.replace("_result.npz", "")
+        point_pos = name.rfind("_point")
+        if point_pos == -1:
+            continue
+        transition = name[:point_pos]
         try:
-            # Use atomic write (write to temp, then rename)
-            temp_checkpoint = self.checkpoint_file + '.tmp'
-            with open(temp_checkpoint, 'w') as f:
-                json.dump(checkpoint_data, f, indent=2)
-            os.replace(temp_checkpoint, self.checkpoint_file)
+            point_index = int(name[point_pos + 6:])
+            # Validate file is readable
+            with np.load(filepath, allow_pickle=False) as _:
+                pass
+            completed.add((transition, point_index))
+        except (ValueError, Exception):
+            continue
+    return completed
 
-        except IOError as e:
-            print(f"Warning: Could not save checkpoint: {e}")
 
-        # Save results
-        if results:
-            try:
-                temp_results = self.results_file + '.tmp'
-                with open(temp_results, 'wb') as f:
-                    pickle.dump(results, f)
-                os.replace(temp_results, self.results_file)
-            except IOError as e:
-                print(f"Warning: Could not save results: {e}")
+def save_run_config(save_dir: str, config: dict) -> str:
+    """
+    Save run configuration for resume validation.
 
-        # Save feature names
-        if feature_names is not None:
-            try:
-                temp_features = self.feature_names_file + '.tmp'
-                np.save(temp_features, feature_names)
-                os.replace(temp_features, self.feature_names_file)
-            except IOError as e:
-                print(f"Warning: Could not save feature names: {e}")
+    Args:
+        save_dir: Directory to save config.
+        config: Dictionary of all run parameters.
 
-    def save_incremental_result(
-        self,
-        sample_index: int,
-        transition_name: str,
-        importance: List[float],
-        feature_names: Optional[List[str]] = None
-    ) -> None:
-        """
-        Save a single analysis result incrementally.
+    Returns:
+        Path to the saved config file.
+    """
+    filepath = os.path.join(save_dir, "run_config.json")
+    serializable = {}
+    for k, v in config.items():
+        if isinstance(v, np.ndarray):
+            serializable[k] = v.tolist()
+        elif isinstance(v, (np.integer,)):
+            serializable[k] = int(v)
+        elif isinstance(v, (np.floating,)):
+            serializable[k] = float(v)
+        else:
+            serializable[k] = v
+    with open(filepath, 'w') as f:
+        json.dump(serializable, f, indent=2)
+    return filepath
 
-        This allows saving results as they're computed, reducing risk of
-        data loss from crashes. More efficient than saving all results
-        every time.
 
-        Args:
-            sample_index: Index of analyzed sample
-            transition_name: Name of transition (e.g., "0_1")
-            importance: Feature importance values
-            feature_names: Feature names (only needed on first call)
-        """
-        # Load current state
-        results, stored_feature_names, completed_samples = self.load_checkpoint()
+def load_run_config(save_dir: str) -> dict:
+    """
+    Load a previously saved run configuration.
 
-        # Update with new result
-        results[sample_index] = [transition_name, importance]
-        completed_samples.add(sample_index)
+    Args:
+        save_dir: Directory containing the config file.
 
-        # Use provided feature names if this is the first result
-        if feature_names is not None and stored_feature_names is None:
-            stored_feature_names = feature_names
+    Returns:
+        Configuration dictionary, or empty dict if not found.
+    """
+    filepath = os.path.join(save_dir, "run_config.json")
+    if not os.path.exists(filepath):
+        return {}
+    with open(filepath, 'r') as f:
+        return json.load(f)
 
-        # Save updated state
-        self.save_checkpoint(results, stored_feature_names, completed_samples)
 
-    def get_remaining_work(
-        self,
-        all_transitions: Dict[str, np.ndarray]
-    ) -> Dict[str, List[int]]:
-        """
-        Determine which samples still need analysis.
+def aggregate_results(
+    save_dir: str,
+    feature_names: np.ndarray,
+    keep_checkpoints: bool = True,
+) -> dict:
+    """
+    Aggregate all per-point result files into the final results dictionary.
 
-        Args:
-            all_transitions: Dictionary mapping transition names to sample arrays
+    Args:
+        save_dir: Directory containing per-point result files.
+        feature_names: Array of feature names.
+        keep_checkpoints: Whether to keep individual result files (default: True).
 
-        Returns:
-            Dictionary mapping transition names to lists of unanalyzed sample indices
-        """
-        _, _, completed_samples = self.load_checkpoint()
+    Returns:
+        Dictionary mapping sample_index -> [transition, importance_vector].
+    """
+    importance_results = {}
+    pattern = os.path.join(save_dir, "*_point*_result.npz")
+    for filepath in glob.glob(pattern):
+        try:
+            with np.load(filepath, allow_pickle=True) as data:
+                sample_index = int(data['sample_index'])
+                transition = str(data['transition'])
+                importance = np.array(data['importance'])
+                importance_results[sample_index] = [transition, importance]
+        except Exception:
+            continue
 
-        remaining_work = {}
+    result_path = os.path.join(save_dir, 'MDTerp_results_all.pkl')
+    with open(result_path, 'wb') as f:
+        pickle.dump(importance_results, f)
 
-        for transition_name, sample_indices in all_transitions.items():
-            # Filter out completed samples
-            remaining_indices = [
-                idx for idx in sample_indices
-                if idx not in completed_samples
-            ]
+    names_path = os.path.join(save_dir, 'MDTerp_feature_names.npy')
+    np.save(names_path, feature_names)
 
-            if remaining_indices:
-                remaining_work[transition_name] = remaining_indices
+    if not keep_checkpoints:
+        for filepath in glob.glob(pattern):
+            os.remove(filepath)
 
-        return remaining_work
-
-    def clear_checkpoint(self) -> None:
-        """
-        Remove checkpoint file to start fresh analysis.
-
-        Does not delete results files, only the checkpoint metadata.
-        """
-        if os.path.exists(self.checkpoint_file):
-            try:
-                os.remove(self.checkpoint_file)
-                print("Checkpoint cleared")
-            except IOError as e:
-                print(f"Warning: Could not remove checkpoint: {e}")
+    return importance_results

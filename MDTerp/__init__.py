@@ -1,20 +1,12 @@
-__version__ = "1.5.0"
-__author__ = """shams mehdi"""
+__version__ = "2.0.0"
+__author__ = """Shams Mehdi"""
 __email__ = "shamsmehdi222@gmail.com"
 
 from MDTerp.base import run
-from MDTerp.checkpoint import CheckpointManager
 from MDTerp.utils import transition_summary, dominant_feature
-
-# Visualization and analysis modules
-from MDTerp import visualization
-from MDTerp import analysis
-
-__all__ = [
-    'run',
-    'CheckpointManager',
-    'transition_summary',
-    'dominant_feature',
-    'visualization',
-    'analysis'
-]
+from MDTerp.visualization import (
+    plot_feature_importance,
+    plot_importance_heatmap,
+    plot_unfaithfulness_curve,
+    plot_point_variability,
+)
