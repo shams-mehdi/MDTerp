@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.5">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
@@ -1121,6 +1121,14 @@
         <td><p>Figure size as (width, height) tuple.</p></td>
         <td><code>(8, 8)</code></td>
       </tr>
+      <tr>
+        <td><code>display_names</code></td>
+        <td><code>Optional[dict]</code></td>
+        <td><p>Optional dict mapping original feature names to display
+names (e.g., LaTeX-formatted strings). Names not in the dict are
+kept as-is.</p></td>
+        <td><code>None</code></td>
+      </tr>
   </tbody>
 </table>
 <p><strong>Returns:</strong></p>
@@ -1148,6 +1156,7 @@
     <span class="n">top_n</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">save_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">figsize</span><span class="p">:</span> <span class="nb">tuple</span> <span class="o">=</span> <span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span>
+    <span class="n">display_names</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">plt</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Plot mean feature importance as a horizontal bar chart for a transition.</span>
@@ -1160,6 +1169,9 @@
 <span class="sd">        top_n: Only show the top N features. None shows all non-zero.</span>
 <span class="sd">        save_path: If provided, save the figure to this path.</span>
 <span class="sd">        figsize: Figure size as (width, height) tuple.</span>
+<span class="sd">        display_names: Optional dict mapping original feature names to display</span>
+<span class="sd">            names (e.g., LaTeX-formatted strings). Names not in the dict are</span>
+<span class="sd">            kept as-is.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        matplotlib Figure object.</span>
@@ -1185,7 +1197,7 @@
 
     <span class="n">ordered_mean</span> <span class="o">=</span> <span class="n">mean_imp</span><span class="p">[</span><span class="n">ordered_indices</span><span class="p">]</span>
     <span class="n">ordered_std</span> <span class="o">=</span> <span class="n">std_imp</span><span class="p">[</span><span class="n">ordered_indices</span><span class="p">]</span>
-    <span class="n">ordered_names</span> <span class="o">=</span> <span class="n">feature_names</span><span class="p">[</span><span class="n">ordered_indices</span><span class="p">]</span>
+    <span class="n">ordered_names</span> <span class="o">=</span> <span class="n">_apply_display_names</span><span class="p">(</span><span class="n">feature_names</span><span class="p">[</span><span class="n">ordered_indices</span><span class="p">],</span> <span class="n">display_names</span><span class="p">)</span>
 
     <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
     <span class="n">y_pos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ordered_mean</span><span class="p">))</span>
@@ -1273,6 +1285,13 @@ per transition (default: 0.8).</p></td>
         <td><p>Figure size. Auto-scaled if None.</p></td>
         <td><code>None</code></td>
       </tr>
+      <tr>
+        <td><code>display_names</code></td>
+        <td><code>Optional[dict]</code></td>
+        <td><p>Optional dict mapping original feature names to display
+names (e.g., LaTeX-formatted strings).</p></td>
+        <td><code>None</code></td>
+      </tr>
   </tbody>
 </table>
 <p><strong>Returns:</strong></p>
@@ -1298,6 +1317,7 @@ per transition (default: 0.8).</p></td>
     <span class="n">importance_coverage</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.8</span><span class="p">,</span>
     <span class="n">save_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">figsize</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">tuple</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">display_names</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">plt</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Plot a heatmap of feature importance across all transitions.</span>
@@ -1313,6 +1333,8 @@ per transition (default: 0.8).</p></td>
 <span class="sd">            per transition (default: 0.8).</span>
 <span class="sd">        save_path: If provided, save the figure to this path.</span>
 <span class="sd">        figsize: Figure size. Auto-scaled if None.</span>
+<span class="sd">        display_names: Optional dict mapping original feature names to display</span>
+<span class="sd">            names (e.g., LaTeX-formatted strings).</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        matplotlib Figure object.</span>
@@ -1330,7 +1352,7 @@ per transition (default: 0.8).</p></td>
     <span class="n">active_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">imp_matrix</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">active_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">active_mask</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">imp_matrix</span> <span class="o">=</span> <span class="n">imp_matrix</span><span class="p">[</span><span class="n">active_indices</span><span class="p">,</span> <span class="p">:]</span>
-    <span class="n">active_names</span> <span class="o">=</span> <span class="n">feature_names</span><span class="p">[</span><span class="n">active_indices</span><span class="p">]</span>
+    <span class="n">active_names</span> <span class="o">=</span> <span class="n">_apply_display_names</span><span class="p">(</span><span class="n">feature_names</span><span class="p">[</span><span class="n">active_indices</span><span class="p">],</span> <span class="n">display_names</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">figsize</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">transitions</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">active_names</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.4</span><span class="p">))</span>
@@ -1558,6 +1580,13 @@ for a given feature, revealing how consistent the explanations are.</p>
         <td><p>Figure size.</p></td>
         <td><code>(10, 6)</code></td>
       </tr>
+      <tr>
+        <td><code>display_names</code></td>
+        <td><code>Optional[dict]</code></td>
+        <td><p>Optional dict mapping original feature names to display
+names (e.g., LaTeX-formatted strings).</p></td>
+        <td><code>None</code></td>
+      </tr>
   </tbody>
 </table>
 <p><strong>Returns:</strong></p>
@@ -1584,6 +1613,7 @@ for a given feature, revealing how consistent the explanations are.</p>
     <span class="n">top_n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
     <span class="n">save_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">figsize</span><span class="p">:</span> <span class="nb">tuple</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span>
+    <span class="n">display_names</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">plt</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Plot per-point importance variability for the top features in a transition.</span>
@@ -1598,6 +1628,8 @@ for a given feature, revealing how consistent the explanations are.</p>
 <span class="sd">        top_n: Number of top features to show (default: 5).</span>
 <span class="sd">        save_path: If provided, save the figure to this path.</span>
 <span class="sd">        figsize: Figure size.</span>
+<span class="sd">        display_names: Optional dict mapping original feature names to display</span>
+<span class="sd">            names (e.g., LaTeX-formatted strings).</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        matplotlib Figure object.</span>
@@ -1637,7 +1669,8 @@ for a given feature, revealing how consistent the explanations are.</p>
                    <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;D&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
 
     <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">positions</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">feature_names</span><span class="p">[</span><span class="n">top_indices</span><span class="p">],</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">)</span>
+    <span class="n">tick_names</span> <span class="o">=</span> <span class="n">_apply_display_names</span><span class="p">(</span><span class="n">feature_names</span><span class="p">[</span><span class="n">top_indices</span><span class="p">],</span> <span class="n">display_names</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">tick_names</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Feature Importance&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span>
         <span class="sa">f</span><span class="s1">&#39;Per-Point Importance Variability</span><span class="se">\n</span><span class="s1">&#39;</span>

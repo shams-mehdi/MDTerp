@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.5">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
@@ -1114,7 +1114,7 @@
 
 
 <h2 id="MDTerp.final_analysis.final_model" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">final_model</span><span class="p">(</span><span class="n">neighborhood_data</span><span class="p">,</span> <span class="n">pred_proba</span><span class="p">,</span> <span class="n">unf_threshold</span><span class="p">,</span> <span class="n">feature_type_indices</span><span class="p">,</span> <span class="n">selected_features</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="n">final_model</span><span class="p">(</span><span class="n">neighborhood_data</span><span class="p">,</span> <span class="n">pred_proba</span><span class="p">,</span> <span class="n">unf_threshold</span><span class="p">,</span> <span class="n">feature_type_indices</span><span class="p">,</span> <span class="n">selected_features</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">use_all_cutoff_features</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
 
 <a href="#MDTerp.final_analysis.final_model" class="headerlink" title="Permanent link">&para;</a></h2>
@@ -1159,10 +1159,26 @@
         <td><em>required</em></td>
       </tr>
       <tr>
+        <td><code>selected_features</code></td>
+        <td><code>np.ndarray</code></td>
+        <td><p>Indices of the features selected for detailed analysis.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
         <td><code>seed</code></td>
         <td><code>int</code></td>
         <td><p>Random seed.</p></td>
         <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>use_all_cutoff_features</code></td>
+        <td><code>bool</code></td>
+        <td><p>If True, use all cutoff features for
+importance instead of selecting optimal k via interpretation entropy.
+This avoids discarding features that may be irrelevant for one sample
+but relevant for another in the same transition ensemble. The final
+importance is computed using all selected features. Default: False.</p></td>
+        <td><code>False</code></td>
       </tr>
   </tbody>
 </table>
@@ -1183,7 +1199,7 @@
 </table>
         <details class="quote">
           <summary>Source code in <code>MDTerp/final_analysis.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">final_model</span><span class="p">(</span><span class="n">neighborhood_data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">pred_proba</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">unf_threshold</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">feature_type_indices</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">selected_features</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">seed</span><span class="p">:</span><span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">final_model</span><span class="p">(</span><span class="n">neighborhood_data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">pred_proba</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">unf_threshold</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">feature_type_indices</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">selected_features</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">seed</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">use_all_cutoff_features</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Function for computing final feature importance by implementing forward feature selection.</span>
 
@@ -1192,7 +1208,13 @@
 <span class="sd">        pred_proba (np.ndarray): Metastable state probabilities obtained from the black-box.</span>
 <span class="sd">        unf_threshold (float): Hyperparameter setting a lower limit on model unfaithafulness. Forward feature selection ends when unfaithfulness reaches lower than this threshold.</span>
 <span class="sd">        feature_type_indices (np.ndarray): Indices of the features to perform the final round of MDTerp on.</span>
+<span class="sd">        selected_features (np.ndarray): Indices of the features selected for detailed analysis.</span>
 <span class="sd">        seed (int): Random seed.</span>
+<span class="sd">        use_all_cutoff_features (bool): If True, use all cutoff features for</span>
+<span class="sd">            importance instead of selecting optimal k via interpretation entropy.</span>
+<span class="sd">            This avoids discarding features that may be irrelevant for one sample</span>
+<span class="sd">            but relevant for another in the same transition ensemble. The final</span>
+<span class="sd">            importance is computed using all selected features. Default: False.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        np.ndarray: Normalized feature importance.</span>
@@ -1228,36 +1250,41 @@
       <span class="n">unfaithfulness_calc</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">predict_proba</span><span class="p">,</span> <span class="n">best_parameters_master</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">best_interp_master</span><span class="p">,</span> <span class="n">best_parameters_converted</span><span class="p">,</span> <span class="n">best_unfaithfulness_master</span><span class="p">,</span> <span class="n">tot_feat</span><span class="p">,</span> <span class="n">selected_features</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span>
 
 
-    <span class="n">optimal_k</span> <span class="o">=</span> <span class="mi">1</span>
-
-
-    <span class="k">if</span> <span class="n">N</span><span class="o">&lt;=</span><span class="mi">3</span><span class="p">:</span>
-      <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">N</span><span class="p">):</span>
-        <span class="n">prime_model</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-        <span class="k">if</span> <span class="n">best_unfaithfulness_master</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">&lt;=</span><span class="n">best_unfaithfulness_master</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">unf_threshold</span><span class="p">:</span>
-          <span class="n">prime_model</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span>
-          <span class="k">continue</span>
-        <span class="k">else</span><span class="p">:</span>
-          <span class="k">break</span>
-
+    <span class="k">if</span> <span class="n">use_all_cutoff_features</span><span class="p">:</span>
+      <span class="c1"># Use all cutoff features: return importance from the model with all</span>
+      <span class="c1"># selected features (last entry), avoiding entropy-based pruning.</span>
+      <span class="n">prime_model</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">best_parameters_converted</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
     <span class="k">else</span><span class="p">:</span>
-      <span class="n">charac_theta_mast</span> <span class="o">=</span> <span class="p">[]</span>
+      <span class="n">optimal_k</span> <span class="o">=</span> <span class="mi">1</span>
 
-      <span class="n">d_U_lst</span> <span class="o">=</span> <span class="p">[]</span>
-      <span class="n">d_S_lst</span> <span class="o">=</span> <span class="p">[]</span>
-      <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">selected_features</span><span class="p">)):</span>
-        <span class="n">d_U_lst</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">best_unfaithfulness_master</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">best_unfaithfulness_master</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-        <span class="n">d_S_lst</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">best_interp_master</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">best_interp_master</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+      <span class="k">if</span> <span class="n">N</span><span class="o">&lt;=</span><span class="mi">3</span><span class="p">:</span>
+        <span class="n">prime_model</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">N</span><span class="p">):</span>
+          <span class="k">if</span> <span class="n">best_unfaithfulness_master</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">&lt;=</span><span class="n">best_unfaithfulness_master</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">unf_threshold</span><span class="p">:</span>
+            <span class="n">prime_model</span> <span class="o">=</span> <span class="n">i</span>
+            <span class="k">continue</span>
+          <span class="k">else</span><span class="p">:</span>
+            <span class="k">break</span>
 
-      <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">selected_features</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
-        <span class="n">charac_theta_mast</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">charac_theta</span><span class="p">(</span><span class="n">d_U_lst</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">d_S_lst</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="n">charac_theta_mast</span> <span class="o">=</span> <span class="p">[]</span>
 
-      <span class="n">range_theta_mast</span> <span class="o">=</span> <span class="p">[]</span>
-      <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">charac_theta_mast</span><span class="p">)):</span>
-        <span class="n">range_theta_mast</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">charac_theta_mast</span><span class="p">)[</span><span class="n">i</span><span class="p">]</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">charac_theta_mast</span><span class="p">)[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">d_U_lst</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">d_S_lst</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">selected_features</span><span class="p">)):</span>
+          <span class="n">d_U_lst</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">best_unfaithfulness_master</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">best_unfaithfulness_master</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+          <span class="n">d_S_lst</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">best_interp_master</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">best_interp_master</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
 
-      <span class="n">prime_model</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">range_theta_mast</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">best_parameters_converted</span><span class="p">)[</span><span class="n">prime_model</span><span class="o">+</span><span class="mi">1</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">best_parameters_converted</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">best_unfaithfulness_master</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">selected_features</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+          <span class="n">charac_theta_mast</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">charac_theta</span><span class="p">(</span><span class="n">d_U_lst</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">d_S_lst</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+
+        <span class="n">range_theta_mast</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">charac_theta_mast</span><span class="p">)):</span>
+          <span class="n">range_theta_mast</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">charac_theta_mast</span><span class="p">)[</span><span class="n">i</span><span class="p">]</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">charac_theta_mast</span><span class="p">)[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="n">prime_model</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">range_theta_mast</span><span class="p">))</span>
+        <span class="n">prime_model</span> <span class="o">=</span> <span class="n">prime_model</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">best_parameters_converted</span><span class="p">)[</span><span class="n">prime_model</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">best_parameters_converted</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">best_unfaithfulness_master</span><span class="p">)</span>
 </code></pre></div>
         </details>
     </div>

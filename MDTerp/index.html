@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.5">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
@@ -1016,6 +1016,7 @@ using Ridge regression with Perturbation).</p>
         <span class="n">save_all</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">n_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">keep_checkpoints</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">use_all_cutoff_features</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Configure and execute the MDTerp analysis pipeline.</span>
@@ -1044,6 +1045,12 @@ using Ridge regression with Perturbation).</p>
 <span class="sd">                number of available CPUs.</span>
 <span class="sd">            keep_checkpoints: Keep per-point result files after aggregation</span>
 <span class="sd">                (default: True).</span>
+<span class="sd">            use_all_cutoff_features: If True (default), retain all cutoff features</span>
+<span class="sd">                in per-point importance instead of pruning via interpretation</span>
+<span class="sd">                entropy. This is useful because a feature may be irrelevant for</span>
+<span class="sd">                one sample but relevant for another within the same transition</span>
+<span class="sd">                ensemble. Final transition-level importance is obtained by</span>
+<span class="sd">                averaging across samples.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">numeric_dict</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">numeric_dict</span> <span class="o">=</span> <span class="p">{}</span>
@@ -1069,6 +1076,7 @@ using Ridge regression with Perturbation).</p>
             <span class="s1">&#39;save_all&#39;</span><span class="p">:</span> <span class="n">save_all</span><span class="p">,</span>
             <span class="s1">&#39;n_workers&#39;</span><span class="p">:</span> <span class="n">n_workers</span><span class="p">,</span>
             <span class="s1">&#39;keep_checkpoints&#39;</span><span class="p">:</span> <span class="n">keep_checkpoints</span><span class="p">,</span>
+            <span class="s1">&#39;use_all_cutoff_features&#39;</span><span class="p">:</span> <span class="n">use_all_cutoff_features</span><span class="p">,</span>
         <span class="p">}</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="kc">None</span>
@@ -1081,7 +1089,7 @@ using Ridge regression with Perturbation).</p>
             <span class="n">sin_cos_dict</span><span class="p">,</span> <span class="n">save_dir</span><span class="p">,</span> <span class="n">point_max</span><span class="p">,</span> <span class="n">prob_threshold_min</span><span class="p">,</span>
             <span class="n">num_samples</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">unfaithfulness_threshold</span><span class="p">,</span>
             <span class="n">periodicity_upper</span><span class="p">,</span> <span class="n">periodicity_lower</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">save_all</span><span class="p">,</span>
-            <span class="n">n_workers</span><span class="p">,</span> <span class="n">keep_checkpoints</span><span class="p">,</span>
+            <span class="n">n_workers</span><span class="p">,</span> <span class="n">keep_checkpoints</span><span class="p">,</span> <span class="n">use_all_cutoff_features</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_execute</span><span class="p">(</span>
@@ -1089,7 +1097,7 @@ using Ridge regression with Perturbation).</p>
         <span class="n">sin_cos_dict</span><span class="p">,</span> <span class="n">save_dir</span><span class="p">,</span> <span class="n">point_max</span><span class="p">,</span> <span class="n">prob_threshold_min</span><span class="p">,</span>
         <span class="n">num_samples</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">unfaithfulness_threshold</span><span class="p">,</span>
         <span class="n">periodicity_upper</span><span class="p">,</span> <span class="n">periodicity_lower</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">save_all</span><span class="p">,</span>
-        <span class="n">n_workers</span><span class="p">,</span> <span class="n">keep_checkpoints</span><span class="p">,</span>
+        <span class="n">n_workers</span><span class="p">,</span> <span class="n">keep_checkpoints</span><span class="p">,</span> <span class="n">use_all_cutoff_features</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Internal pipeline execution.&quot;&quot;&quot;</span>
         <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">save_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -1125,6 +1133,10 @@ using Ridge regression with Perturbation).</p>
         <span class="k">if</span> <span class="n">n_transitions</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;No transition detected. Check hyperparameters!&quot;</span><span class="p">)</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No transition detected. Check hyperparameters!&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Max features per point (cutoff) &gt;&gt;&gt; </span><span class="si">{</span><span class="n">cutoff</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;use_all_cutoff_features &gt;&gt;&gt; </span><span class="si">{</span><span class="n">use_all_cutoff_features</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="mi">100</span> <span class="o">*</span> <span class="s1">&#39;-&#39;</span><span class="p">)</span>
 
         <span class="c1"># Save run config for resume validation</span>
@@ -1165,6 +1177,7 @@ using Ridge regression with Perturbation).</p>
                     <span class="s1">&#39;periodicity_lower&#39;</span><span class="p">:</span> <span class="n">periodicity_lower</span><span class="p">,</span>
                     <span class="s1">&#39;alpha&#39;</span><span class="p">:</span> <span class="n">alpha</span><span class="p">,</span>
                     <span class="s1">&#39;save_all&#39;</span><span class="p">:</span> <span class="n">save_all</span><span class="p">,</span>
+                    <span class="s1">&#39;use_all_cutoff_features&#39;</span><span class="p">:</span> <span class="n">use_all_cutoff_features</span><span class="p">,</span>
                 <span class="p">})</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">work_items</span><span class="p">:</span>
@@ -1240,7 +1253,7 @@ using Ridge regression with Perturbation).</p>
 
 
 <h2 id="MDTerp.base.run.__init__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">np_data</span><span class="p">,</span> <span class="n">model_function_loc</span><span class="p">,</span> <span class="n">numeric_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">angle_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sin_cos_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">save_dir</span><span class="o">=</span><span class="s1">&#39;./results/&#39;</span><span class="p">,</span> <span class="n">point_max</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">prob_threshold_min</span><span class="o">=</span><span class="mf">0.475</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">unfaithfulness_threshold</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">periodicity_upper</span><span class="o">=</span><span class="mf">3.141592653589793</span><span class="p">,</span> <span class="n">periodicity_lower</span><span class="o">=-</span><span class="mf">3.141592653589793</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">save_all</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">n_workers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">keep_checkpoints</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">np_data</span><span class="p">,</span> <span class="n">model_function_loc</span><span class="p">,</span> <span class="n">numeric_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">angle_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sin_cos_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">save_dir</span><span class="o">=</span><span class="s1">&#39;./results/&#39;</span><span class="p">,</span> <span class="n">point_max</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">prob_threshold_min</span><span class="o">=</span><span class="mf">0.475</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">unfaithfulness_threshold</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">periodicity_upper</span><span class="o">=</span><span class="mf">3.141592653589793</span><span class="p">,</span> <span class="n">periodicity_lower</span><span class="o">=-</span><span class="mf">3.141592653589793</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">save_all</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">n_workers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">keep_checkpoints</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">use_all_cutoff_features</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
   <span class="doc doc-properties">
       <small class="doc doc-property doc-property-special"><code>special</code></small>
@@ -1376,6 +1389,17 @@ number of available CPUs.</p></td>
 (default: True).</p></td>
         <td><code>True</code></td>
       </tr>
+      <tr>
+        <td><code>use_all_cutoff_features</code></td>
+        <td><code>bool</code></td>
+        <td><p>If True (default), retain all cutoff features
+in per-point importance instead of pruning via interpretation
+entropy. This is useful because a feature may be irrelevant for
+one sample but relevant for another within the same transition
+ensemble. Final transition-level importance is obtained by
+averaging across samples.</p></td>
+        <td><code>False</code></td>
+      </tr>
   </tbody>
 </table>
         <details class="quote">
@@ -1400,6 +1424,7 @@ number of available CPUs.</p></td>
     <span class="n">save_all</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">n_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">keep_checkpoints</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">use_all_cutoff_features</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Configure and execute the MDTerp analysis pipeline.</span>
@@ -1428,6 +1453,12 @@ number of available CPUs.</p></td>
 <span class="sd">            number of available CPUs.</span>
 <span class="sd">        keep_checkpoints: Keep per-point result files after aggregation</span>
 <span class="sd">            (default: True).</span>
+<span class="sd">        use_all_cutoff_features: If True (default), retain all cutoff features</span>
+<span class="sd">            in per-point importance instead of pruning via interpretation</span>
+<span class="sd">            entropy. This is useful because a feature may be irrelevant for</span>
+<span class="sd">            one sample but relevant for another within the same transition</span>
+<span class="sd">            ensemble. Final transition-level importance is obtained by</span>
+<span class="sd">            averaging across samples.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">numeric_dict</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">numeric_dict</span> <span class="o">=</span> <span class="p">{}</span>
@@ -1453,6 +1484,7 @@ number of available CPUs.</p></td>
         <span class="s1">&#39;save_all&#39;</span><span class="p">:</span> <span class="n">save_all</span><span class="p">,</span>
         <span class="s1">&#39;n_workers&#39;</span><span class="p">:</span> <span class="n">n_workers</span><span class="p">,</span>
         <span class="s1">&#39;keep_checkpoints&#39;</span><span class="p">:</span> <span class="n">keep_checkpoints</span><span class="p">,</span>
+        <span class="s1">&#39;use_all_cutoff_features&#39;</span><span class="p">:</span> <span class="n">use_all_cutoff_features</span><span class="p">,</span>
     <span class="p">}</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="kc">None</span>
@@ -1465,7 +1497,7 @@ number of available CPUs.</p></td>
         <span class="n">sin_cos_dict</span><span class="p">,</span> <span class="n">save_dir</span><span class="p">,</span> <span class="n">point_max</span><span class="p">,</span> <span class="n">prob_threshold_min</span><span class="p">,</span>
         <span class="n">num_samples</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">unfaithfulness_threshold</span><span class="p">,</span>
         <span class="n">periodicity_upper</span><span class="p">,</span> <span class="n">periodicity_lower</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">save_all</span><span class="p">,</span>
-        <span class="n">n_workers</span><span class="p">,</span> <span class="n">keep_checkpoints</span><span class="p">,</span>
+        <span class="n">n_workers</span><span class="p">,</span> <span class="n">keep_checkpoints</span><span class="p">,</span> <span class="n">use_all_cutoff_features</span><span class="p">,</span>
     <span class="p">)</span>
 </code></pre></div>
         </details>
