@@ -15,6 +15,7 @@ import os
 import shutil
 import multiprocessing as mp
 from typing import List, Callable, Any
+from tqdm import tqdm
 
 from MDTerp.neighborhood import generate_neighborhood
 from MDTerp.init_analysis import init_model
@@ -148,6 +149,7 @@ def _phase3_final_model_and_save(args: dict) -> dict:
             perturbation_data, state_probs,
             args['unfaithfulness_threshold'], args['feature_type_indices'],
             args['selected_features'], args['seed'],
+            args.get('use_all_cutoff_features', False),
         )
 
         importance = make_result(
@@ -181,13 +183,28 @@ def _phase3_final_model_and_save(args: dict) -> dict:
 # Orchestrator: runs the 3-phase pipeline
 # ---------------------------------------------------------------------------
 
-def _map_parallel_or_serial(func, items: list, n_workers: int) -> list:
-    """Map a function over items, using multiprocessing if n_workers > 1."""
+def _map_parallel_or_serial(func, items: list, n_workers: int, desc: str = "") -> list:
+    """Map a function over items, using multiprocessing if n_workers > 1.
+
+    Shows a tqdm progress bar during execution.
+    """
+    if not items:
+        return []
+
     if n_workers <= 1 or len(items) <= 1:
-        return [func(item) for item in items]
+        results = []
+        for item in tqdm(items, desc=desc, unit="pt"):
+            results.append(func(item))
+        return results
 
     with mp.Pool(processes=n_workers) as pool:
-        return pool.map(func, items)
+        results = list(tqdm(
+            pool.imap(func, items),
+            total=len(items),
+            desc=desc,
+            unit="pt",
+        ))
+    return results
 
 
 def run_parallel(
@@ -219,9 +236,12 @@ def run_parallel(
     Returns:
         List of result dicts with status info per point.
     """
+    n_points = len(work_items)
+
     # === Phase 1: Generate round-1 neighborhoods (CPU, parallel) ===
     phase1_results = _map_parallel_or_serial(
         _phase1_generate_neighborhood, work_items, n_workers,
+        desc=f"Phase 1/3: Neighborhoods ({n_points} pts)",
     )
 
     # === GPU: Run model on all round-1 neighborhoods (serial, main process) ===
@@ -247,6 +267,7 @@ def run_parallel(
 
     phase2_results = _map_parallel_or_serial(
         _phase2_init_and_neighborhood, phase2_inputs, n_workers,
+        desc=f"Phase 2/3: Feature selection ({len(phase2_inputs)} pts)",
     )
 
     # === GPU: Run model on all round-2 neighborhoods (serial, main process) ===
@@ -271,6 +292,7 @@ def run_parallel(
 
     phase3_results = _map_parallel_or_serial(
         _phase3_final_model_and_save, phase3_inputs, n_workers,
+        desc=f"Phase 3/3: Forward selection ({len(phase3_inputs)} pts)",
     )
 
     # === Build final results, including failed points from any phase ===

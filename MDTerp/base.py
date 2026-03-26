@@ -57,6 +57,7 @@ class run:
         save_all: bool = False,
         n_workers: int = None,
         keep_checkpoints: bool = True,
+        use_all_cutoff_features: bool = False,
     ) -> None:
         """
         Configure and execute the MDTerp analysis pipeline.
@@ -85,6 +86,12 @@ class run:
                 number of available CPUs.
             keep_checkpoints: Keep per-point result files after aggregation
                 (default: True).
+            use_all_cutoff_features: If True (default), retain all cutoff features
+                in per-point importance instead of pruning via interpretation
+                entropy. This is useful because a feature may be irrelevant for
+                one sample but relevant for another within the same transition
+                ensemble. Final transition-level importance is obtained by
+                averaging across samples.
         """
         if numeric_dict is None:
             numeric_dict = {}
@@ -110,6 +117,7 @@ class run:
             'save_all': save_all,
             'n_workers': n_workers,
             'keep_checkpoints': keep_checkpoints,
+            'use_all_cutoff_features': use_all_cutoff_features,
         }
 
         self.results = None
@@ -122,7 +130,7 @@ class run:
             sin_cos_dict, save_dir, point_max, prob_threshold_min,
             num_samples, cutoff, seed, unfaithfulness_threshold,
             periodicity_upper, periodicity_lower, alpha, save_all,
-            n_workers, keep_checkpoints,
+            n_workers, keep_checkpoints, use_all_cutoff_features,
         )
 
     def _execute(
@@ -130,7 +138,7 @@ class run:
         sin_cos_dict, save_dir, point_max, prob_threshold_min,
         num_samples, cutoff, seed, unfaithfulness_threshold,
         periodicity_upper, periodicity_lower, alpha, save_all,
-        n_workers, keep_checkpoints,
+        n_workers, keep_checkpoints, use_all_cutoff_features,
     ):
         """Internal pipeline execution."""
         os.makedirs(save_dir, exist_ok=True)
@@ -166,6 +174,10 @@ class run:
         if n_transitions == 0:
             logger.info("No transition detected. Check hyperparameters!")
             raise ValueError("No transition detected. Check hyperparameters!")
+        logger.info(f"Max features per point (cutoff) >>> {cutoff}")
+        logger.info(
+            f"use_all_cutoff_features >>> {use_all_cutoff_features}"
+        )
         logger.info(100 * '-')
 
         # Save run config for resume validation
@@ -206,6 +218,7 @@ class run:
                     'periodicity_lower': periodicity_lower,
                     'alpha': alpha,
                     'save_all': save_all,
+                    'use_all_cutoff_features': use_all_cutoff_features,
                 })
 
         if not work_items:

@@ -109,7 +109,7 @@ def charac_theta(d_U: np.ndarray,d_S: np.ndarray) -> np.ndarray:
   """
   return -d_U/d_S
     
-def final_model(neighborhood_data: np.ndarray, pred_proba: np.ndarray, unf_threshold: float, feature_type_indices: np.ndarray, selected_features: np.ndarray, seed:int) -> np.ndarray:
+def final_model(neighborhood_data: np.ndarray, pred_proba: np.ndarray, unf_threshold: float, feature_type_indices: np.ndarray, selected_features: np.ndarray, seed:int, use_all_cutoff_features: bool = False) -> np.ndarray:
     """
     Function for computing final feature importance by implementing forward feature selection.
 
@@ -118,8 +118,14 @@ def final_model(neighborhood_data: np.ndarray, pred_proba: np.ndarray, unf_thres
         pred_proba (np.ndarray): Metastable state probabilities obtained from the black-box.
         unf_threshold (float): Hyperparameter setting a lower limit on model unfaithafulness. Forward feature selection ends when unfaithfulness reaches lower than this threshold.
         feature_type_indices (np.ndarray): Indices of the features to perform the final round of MDTerp on.
+        selected_features (np.ndarray): Indices of the features selected for detailed analysis.
         seed (int): Random seed.
-        
+        use_all_cutoff_features (bool): If True, use all cutoff features for
+            importance instead of selecting optimal k via interpretation entropy.
+            This avoids discarding features that may be irrelevant for one sample
+            but relevant for another in the same transition ensemble. The final
+            importance is computed using all selected features. Default: False.
+
     Returns:
         np.ndarray: Normalized feature importance.
     """
@@ -154,33 +160,38 @@ def final_model(neighborhood_data: np.ndarray, pred_proba: np.ndarray, unf_thres
       unfaithfulness_calc(k, N, data, predict_proba, best_parameters_master, labels, best_interp_master, best_parameters_converted, best_unfaithfulness_master, tot_feat, selected_features, seed)
 
 
-    optimal_k = 1
-    
-    
-    if N<=3:
-      for i in range(1,N):
-        prime_model = -1
-        if best_unfaithfulness_master[i]<=best_unfaithfulness_master[i-1] - unf_threshold:
-          prime_model = copy.deepcopy(i)-1
-          continue
-        else:
-          break
-    
+    if use_all_cutoff_features:
+      # Use all cutoff features: return importance from the model with all
+      # selected features (last entry), avoiding entropy-based pruning.
+      prime_model = len(best_parameters_converted) - 1
     else:
-      charac_theta_mast = []
-    
-      d_U_lst = []
-      d_S_lst = []
-      for i in range(1, len(selected_features)):
-        d_U_lst.append(best_unfaithfulness_master[i] - best_unfaithfulness_master[i-1])
-        d_S_lst.append(best_interp_master[i] - best_interp_master[i-1])
-    
-      for i in range(len(selected_features)-1):
-        charac_theta_mast.append(charac_theta(d_U_lst[i], d_S_lst[i]))
-      
-      range_theta_mast = []
-      for i in range(1,len(charac_theta_mast)):
-        range_theta_mast.append(np.array(charac_theta_mast)[i]-np.array(charac_theta_mast)[i-1])
-    
-      prime_model = np.argmin(np.array(range_theta_mast))
-    return np.absolute(np.array(best_parameters_converted)[prime_model+1]), np.absolute(np.array(best_parameters_converted)), np.array(best_unfaithfulness_master)
+      optimal_k = 1
+
+      if N<=3:
+        prime_model = 0
+        for i in range(1,N):
+          if best_unfaithfulness_master[i]<=best_unfaithfulness_master[i-1] - unf_threshold:
+            prime_model = i
+            continue
+          else:
+            break
+
+      else:
+        charac_theta_mast = []
+
+        d_U_lst = []
+        d_S_lst = []
+        for i in range(1, len(selected_features)):
+          d_U_lst.append(best_unfaithfulness_master[i] - best_unfaithfulness_master[i-1])
+          d_S_lst.append(best_interp_master[i] - best_interp_master[i-1])
+
+        for i in range(len(selected_features)-1):
+          charac_theta_mast.append(charac_theta(d_U_lst[i], d_S_lst[i]))
+
+        range_theta_mast = []
+        for i in range(1,len(charac_theta_mast)):
+          range_theta_mast.append(np.array(charac_theta_mast)[i]-np.array(charac_theta_mast)[i-1])
+
+        prime_model = np.argmin(np.array(range_theta_mast))
+        prime_model = prime_model + 1
+    return np.absolute(np.array(best_parameters_converted)[prime_model]), np.absolute(np.array(best_parameters_converted)), np.array(best_unfaithfulness_master)

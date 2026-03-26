@@ -401,6 +401,159 @@ class TestVisualization(unittest.TestCase):
             plot_point_variability(self.pkl_path, self.names_path, "9_9")
 
 
+class TestDisplayNames(unittest.TestCase):
+    """Tests for display_names parameter in visualization functions."""
+
+    def setUp(self):
+        self.test_dir = tempfile.mkdtemp()
+        results = {
+            0: ["0_1", np.array([0.8, 0.1, 0.1])],
+            1: ["0_1", np.array([0.6, 0.3, 0.1])],
+            2: ["0_1", np.array([0.7, 0.2, 0.1])],
+        }
+        self.pkl_path = os.path.join(self.test_dir, 'MDTerp_results_all.pkl')
+        with open(self.pkl_path, 'wb') as f:
+            pickle.dump(results, f)
+        self.names_path = os.path.join(self.test_dir, 'MDTerp_feature_names.npy')
+        np.save(self.names_path, np.array(["feat_a", "feat_b", "feat_c"]))
+        self.display_names = {
+            "feat_a": r"$\phi_1$",
+            "feat_b": r"$\psi_2$",
+            "feat_c": r"$\chi_3$",
+        }
+
+    def tearDown(self):
+        plt.close('all')
+        shutil.rmtree(self.test_dir)
+
+    def test_feature_importance_display_names(self):
+        from MDTerp.visualization import plot_feature_importance
+        fig = plot_feature_importance(
+            self.pkl_path, self.names_path, "0_1",
+            display_names=self.display_names,
+        )
+        ax = fig.axes[0]
+        labels = [t.get_text() for t in ax.get_yticklabels()]
+        self.assertTrue(any(r"$\phi_1$" in l for l in labels))
+
+    def test_heatmap_display_names(self):
+        from MDTerp.visualization import plot_importance_heatmap
+        fig = plot_importance_heatmap(
+            self.pkl_path, self.names_path,
+            display_names=self.display_names,
+        )
+        ax = fig.axes[0]
+        labels = [t.get_text() for t in ax.get_yticklabels()]
+        self.assertTrue(any(r"$\phi_1$" in l for l in labels))
+
+    def test_point_variability_display_names(self):
+        from MDTerp.visualization import plot_point_variability
+        fig = plot_point_variability(
+            self.pkl_path, self.names_path, "0_1", top_n=2,
+            display_names=self.display_names,
+        )
+        ax = fig.axes[0]
+        labels = [t.get_text() for t in ax.get_xticklabels()]
+        self.assertTrue(any("$" in l for l in labels))
+
+    def test_display_names_none_uses_originals(self):
+        from MDTerp.visualization import plot_feature_importance
+        fig = plot_feature_importance(
+            self.pkl_path, self.names_path, "0_1",
+            display_names=None,
+        )
+        ax = fig.axes[0]
+        labels = [t.get_text() for t in ax.get_yticklabels()]
+        self.assertTrue(any("feat_a" in l for l in labels))
+
+    def test_partial_display_names(self):
+        """Features not in dict should keep original names."""
+        from MDTerp.visualization import plot_feature_importance
+        partial = {"feat_a": r"$\phi_1$"}
+        fig = plot_feature_importance(
+            self.pkl_path, self.names_path, "0_1",
+            display_names=partial,
+        )
+        ax = fig.axes[0]
+        labels = [t.get_text() for t in ax.get_yticklabels()]
+        self.assertTrue(any(r"$\phi_1$" in l for l in labels))
+        self.assertTrue(any("feat_b" in l for l in labels))
+
+
+class TestUseAllCutoffFeatures(unittest.TestCase):
+    """Tests for use_all_cutoff_features parameter in final_model."""
+
+    def test_use_all_cutoff_returns_all_features(self):
+        """With use_all_cutoff_features=True, importance should have nonzero
+        values for all selected features."""
+        from MDTerp.final_analysis import final_model
+        np.random.seed(42)
+        n_samples = 500
+        n_features = 5
+
+        # Create synthetic neighborhood data
+        neighborhood_data = np.random.randn(n_samples, n_features)
+        # Create synthetic probabilities with clear class separation
+        pred_proba = np.zeros((n_samples, 2))
+        pred_proba[:, 0] = 0.5 + 0.3 * np.tanh(neighborhood_data[:, 0] + neighborhood_data[:, 1])
+        pred_proba[:, 1] = 1 - pred_proba[:, 0]
+
+        feature_type_indices = [
+            np.arange(n_features),  # numeric
+            np.array([], dtype=int),  # angle
+            np.array([], dtype=int),  # sin
+            np.array([], dtype=int),  # cos
+        ]
+        selected_features = np.arange(n_features)
+
+        imp_all, _, _ = final_model(
+            neighborhood_data, pred_proba, 0.01,
+            feature_type_indices, selected_features, seed=42,
+            use_all_cutoff_features=True,
+        )
+        # All selected features should have importance assigned (last model uses all)
+        self.assertEqual(imp_all.shape[0], n_features)
+        # At least some features should be nonzero
+        self.assertGreater(np.count_nonzero(imp_all), 0)
+
+    def test_use_all_cutoff_vs_entropy(self):
+        """use_all_cutoff_features=True should generally retain more features
+        than entropy-based selection."""
+        from MDTerp.final_analysis import final_model
+        np.random.seed(42)
+        n_samples = 500
+        n_features = 5
+
+        neighborhood_data = np.random.randn(n_samples, n_features)
+        pred_proba = np.zeros((n_samples, 2))
+        pred_proba[:, 0] = 0.5 + 0.3 * np.tanh(neighborhood_data[:, 0])
+        pred_proba[:, 1] = 1 - pred_proba[:, 0]
+
+        feature_type_indices = [
+            np.arange(n_features),
+            np.array([], dtype=int),
+            np.array([], dtype=int),
+            np.array([], dtype=int),
+        ]
+        selected_features = np.arange(n_features)
+
+        imp_all, _, _ = final_model(
+            neighborhood_data, pred_proba, 0.01,
+            feature_type_indices, selected_features, seed=42,
+            use_all_cutoff_features=True,
+        )
+        imp_entropy, _, _ = final_model(
+            neighborhood_data, pred_proba, 0.01,
+            feature_type_indices, selected_features, seed=42,
+            use_all_cutoff_features=False,
+        )
+        # use_all should have >= nonzero features compared to entropy-based
+        self.assertGreaterEqual(
+            np.count_nonzero(imp_all),
+            np.count_nonzero(imp_entropy),
+        )
+
+
 class TestInterpretationEntropy(unittest.TestCase):
     """Tests for interpretation_entropy in final_analysis.py."""
 

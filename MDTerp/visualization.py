@@ -13,6 +13,25 @@ from typing import Optional
 from MDTerp.utils import transition_summary
 
 
+def _apply_display_names(
+    feature_names: np.ndarray,
+    display_names: Optional[dict],
+) -> np.ndarray:
+    """Map original feature names to display names using a dictionary.
+
+    Args:
+        feature_names: Array of original feature name strings.
+        display_names: Optional dict mapping original name -> display name.
+            Names not in the dict are kept as-is.
+
+    Returns:
+        Array of display names.
+    """
+    if display_names is None:
+        return feature_names
+    return np.array([display_names.get(str(n), str(n)) for n in feature_names])
+
+
 def plot_feature_importance(
     result_path: str,
     feature_names_path: str,
@@ -21,6 +40,7 @@ def plot_feature_importance(
     top_n: Optional[int] = None,
     save_path: Optional[str] = None,
     figsize: tuple = (8, 8),
+    display_names: Optional[dict] = None,
 ) -> plt.Figure:
     """
     Plot mean feature importance as a horizontal bar chart for a transition.
@@ -33,6 +53,9 @@ def plot_feature_importance(
         top_n: Only show the top N features. None shows all non-zero.
         save_path: If provided, save the figure to this path.
         figsize: Figure size as (width, height) tuple.
+        display_names: Optional dict mapping original feature names to display
+            names (e.g., LaTeX-formatted strings). Names not in the dict are
+            kept as-is.
 
     Returns:
         matplotlib Figure object.
@@ -58,7 +81,7 @@ def plot_feature_importance(
 
     ordered_mean = mean_imp[ordered_indices]
     ordered_std = std_imp[ordered_indices]
-    ordered_names = feature_names[ordered_indices]
+    ordered_names = _apply_display_names(feature_names[ordered_indices], display_names)
 
     fig, ax = plt.subplots(figsize=figsize)
     y_pos = np.arange(len(ordered_mean))
@@ -93,6 +116,7 @@ def plot_importance_heatmap(
     importance_coverage: float = 0.8,
     save_path: Optional[str] = None,
     figsize: Optional[tuple] = None,
+    display_names: Optional[dict] = None,
 ) -> plt.Figure:
     """
     Plot a heatmap of feature importance across all transitions.
@@ -108,6 +132,8 @@ def plot_importance_heatmap(
             per transition (default: 0.8).
         save_path: If provided, save the figure to this path.
         figsize: Figure size. Auto-scaled if None.
+        display_names: Optional dict mapping original feature names to display
+            names (e.g., LaTeX-formatted strings).
 
     Returns:
         matplotlib Figure object.
@@ -125,7 +151,7 @@ def plot_importance_heatmap(
     active_mask = np.any(imp_matrix > 0, axis=1)
     active_indices = np.where(active_mask)[0]
     imp_matrix = imp_matrix[active_indices, :]
-    active_names = feature_names[active_indices]
+    active_names = _apply_display_names(feature_names[active_indices], display_names)
 
     if figsize is None:
         figsize = (max(6, len(transitions) * 2), max(6, len(active_names) * 0.4))
@@ -221,6 +247,7 @@ def plot_point_variability(
     top_n: int = 5,
     save_path: Optional[str] = None,
     figsize: tuple = (10, 6),
+    display_names: Optional[dict] = None,
 ) -> plt.Figure:
     """
     Plot per-point importance variability for the top features in a transition.
@@ -235,6 +262,8 @@ def plot_point_variability(
         top_n: Number of top features to show (default: 5).
         save_path: If provided, save the figure to this path.
         figsize: Figure size.
+        display_names: Optional dict mapping original feature names to display
+            names (e.g., LaTeX-formatted strings).
 
     Returns:
         matplotlib Figure object.
@@ -274,7 +303,8 @@ def plot_point_variability(
                    marker='D', s=80, color='red', zorder=5)
 
     ax.set_xticks(positions)
-    ax.set_xticklabels(feature_names[top_indices], fontsize=12, rotation=30, ha='right')
+    tick_names = _apply_display_names(feature_names[top_indices], display_names)
+    ax.set_xticklabels(tick_names, fontsize=12, rotation=30, ha='right')
     ax.set_ylabel('Feature Importance', fontsize=14)
     ax.set_title(
         f'Per-Point Importance Variability\n'
